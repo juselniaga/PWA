@@ -89,7 +89,7 @@
             </form>
 
             <div class="mt-auto p-6 flex flex-col items-center gap-2">
-                <div class="h-[1px] w-12 bg-slate-200"></div>
+                <div class="h-px w-12 bg-slate-200"></div>
                 <p class="text-slate-400 text-[9px] font-bold text-center uppercase tracking-tighter">
                     © 2024 MP Jasin. All Rights Reserved.
                 </p>
@@ -98,7 +98,7 @@
         </div>
 
         <!-- Todo Screen -->
-        <div id="todo-screen" class="hidden flex flex-col h-full bg-slate-50">
+        <div id="todo-screen" class="hidden flex-col h-full bg-slate-50">
             <!-- Header -->
             <header
                 class="px-6 pt-4 pb-2 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
@@ -206,7 +206,7 @@
         </div>
 
         <!-- Register Site Screen -->
-        <div id="register-site-screen" class="hidden flex flex-col h-full bg-slate-50">
+        <div id="register-site-screen" class="hidden h-full bg-slate-50">
             <!-- Top App Bar -->
             <div class="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-100 shrink-0">
                 <div class="flex items-center p-4 justify-between">
@@ -369,7 +369,7 @@
         </div>
 
         <!-- Site Visit Screen -->
-        <div id="site-visit-screen" class="hidden flex flex-col h-full bg-slate-50">
+        <div id="site-visit-screen" class="hidden flex-col h-full bg-slate-50">
             <!-- Header -->
             <div class="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-100 shrink-0">
                 <div class="flex items-center p-4 justify-between">
@@ -408,6 +408,56 @@
                         Set Lokasi Semasa
                     </button>
                 </section>
+
+                <!-- Application Info Accordion -->
+                <div class="rounded-2xl border border-indigo-100 bg-indigo-50/40 overflow-hidden shadow-sm">
+                    <button id="app-info-toggle"
+                        class="w-full flex items-center justify-between px-4 py-3 text-left focus:outline-none"
+                        aria-expanded="false">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-indigo-600 text-[18px]">folder_open</span>
+                            <span class="text-indigo-700 text-[11px] font-black uppercase tracking-wider">Maklumat Permohonan</span>
+                        </div>
+                        <span id="app-info-chevron"
+                            class="material-symbols-outlined text-indigo-400 text-[20px] transition-transform duration-200">expand_more</span>
+                    </button>
+                    <div id="app-info-body" class="hidden px-4 pb-4 space-y-2">
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-3">
+                            <div>
+                                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">No. Rujukan</p>
+                                <p id="ai-reference-no" class="text-xs font-bold text-slate-800 mt-0.5">—</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">No. Fail</p>
+                                <p id="ai-no-fail" class="text-xs font-bold text-slate-800 mt-0.5">—</p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Tajuk</p>
+                                <p id="ai-tajuk" class="text-xs font-bold text-slate-800 mt-0.5">—</p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Lokasi Permohonan</p>
+                                <p id="ai-lokasi" class="text-xs text-slate-700 mt-0.5">—</p>
+                            </div>
+                            <div class="col-span-2 border-t border-indigo-100 pt-2">
+                                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Nama Pemaju</p>
+                                <p id="ai-developer-name" class="text-xs font-bold text-slate-800 mt-0.5">—</p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Alamat Pemaju</p>
+                                <p id="ai-developer-address" class="text-xs text-slate-700 mt-0.5">—</p>
+                            </div>
+                            <div class="col-span-2 pt-1">
+                                <a id="view-map-link" href="#" target="_blank" rel="noopener noreferrer"
+                                    class="hidden items-center gap-1.5 text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+                                    <span class="material-symbols-outlined text-[14px]">map</span>
+                                    Lihat di Google Maps
+                                </a>
+                                <p id="view-map-placeholder" class="text-[10px] text-slate-300 italic">Koordinat belum tersedia</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Maklumat MapInfo -->
                 <section class="space-y-4">
@@ -477,7 +527,7 @@
                             <!-- Card body -->
                             <div class="p-4 space-y-3">
                                 <textarea id="visit-finding-north"
-                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-[56px] focus:border-indigo-300 focus:ring-0 transition-colors"
+                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-14 focus:border-indigo-300 focus:ring-0 transition-colors"
                                     placeholder="Keterangan keadaan arah Utara..."></textarea>
                                 <!-- Hidden input -->
                                 <input type="file" id="photo-utara" accept="image/*" capture="environment" class="hidden" />
@@ -513,7 +563,7 @@
                             </div>
                             <div class="p-4 space-y-3">
                                 <textarea id="visit-findings-south"
-                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-[56px] focus:border-amber-300 focus:ring-0 transition-colors"
+                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-14 focus:border-amber-300 focus:ring-0 transition-colors"
                                     placeholder="Keterangan keadaan arah Selatan..."></textarea>
                                 <input type="file" id="photo-selatan" accept="image/*" capture="environment" class="hidden" />
                                 <div id="preview-selatan" class="hidden rounded-xl overflow-hidden border border-slate-200 relative">
@@ -546,7 +596,7 @@
                             </div>
                             <div class="p-4 space-y-3">
                                 <textarea id="visit-findings-east"
-                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-[56px] focus:border-emerald-300 focus:ring-0 transition-colors"
+                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-14 focus:border-emerald-300 focus:ring-0 transition-colors"
                                     placeholder="Keterangan keadaan arah Timur..."></textarea>
                                 <input type="file" id="photo-timur" accept="image/*" capture="environment" class="hidden" />
                                 <div id="preview-timur" class="hidden rounded-xl overflow-hidden border border-slate-200 relative">
@@ -579,7 +629,7 @@
                             </div>
                             <div class="p-4 space-y-3">
                                 <textarea id="visit-finding-west"
-                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-[56px] focus:border-violet-300 focus:ring-0 transition-colors"
+                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-14 focus:border-violet-300 focus:ring-0 transition-colors"
                                     placeholder="Keterangan keadaan arah Barat..."></textarea>
                                 <input type="file" id="photo-barat" accept="image/*" capture="environment" class="hidden" />
                                 <div id="preview-barat" class="hidden rounded-xl overflow-hidden border border-slate-200 relative">
@@ -611,14 +661,14 @@
                             <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">6. Aktiviti Sedia Ada
                                 Atas Tapak</label>
                             <textarea id="visit-activity"
-                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-[80px]"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-20"
                                 placeholder="Nyatakan aktiviti sediada..."></textarea>
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">7. Kemudahan Sedia Ada
                                 Sekitar</label>
                             <textarea id="visit-facility"
-                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-[80px]"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-20"
                                 placeholder="e.g. Surau, Balairaya terhampir..."></textarea>
                         </div>
                     </div>
@@ -654,10 +704,10 @@
                                 type="text" />
                         </div>
                         <div class="flex flex-col gap-1.5 mt-2">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1 font-extrabold">9.
+                            <label class="text-[10px] font-extrabold text-slate-500 uppercase ml-1">9.
                                 Topografi</label>
                             <textarea id="visit-topography"
-                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-[80px]"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-20"
                                 placeholder="Nyatakan keadaan rupa bumi tapak..."></textarea>
                         </div>
                     </div>
@@ -742,7 +792,7 @@
         </div>
 
         <!-- Review Page Screen -->
-        <div id="review-screen" class="hidden flex flex-col h-full bg-slate-50">
+        <div id="review-screen" class="hidden flex-col h-full bg-slate-50">
             <!-- Header -->
             <div class="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-100 shrink-0">
                 <div class="flex items-center p-4 justify-between">

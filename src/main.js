@@ -251,6 +251,17 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   document.getElementById('set-current-location-btn')?.addEventListener('click', () => getGPSLocation('visit-coordinates'));
+
+  // --- Application Info Accordion toggle ---
+  const appInfoToggle = document.getElementById('app-info-toggle');
+  const appInfoBody   = document.getElementById('app-info-body');
+  const appInfoChevron = document.getElementById('app-info-chevron');
+  appInfoToggle?.addEventListener('click', () => {
+    const isOpen = !appInfoBody.classList.contains('hidden');
+    appInfoBody.classList.toggle('hidden', isOpen);
+    appInfoChevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+    appInfoToggle.setAttribute('aria-expanded', String(!isOpen));
+  });
   document.getElementById('reg-set-location-btn')?.addEventListener('click', () => getGPSLocation('reg-google-lat'));
 
   // --- Directional Camera Capture ---
@@ -487,7 +498,11 @@ async function loadTodoTasks() {
           currentApplicationId = e.target.getAttribute('data-id');
           const processName = e.target.getAttribute('data-process');
           if (processName === 'register_site') navigateTo('registerSite');
-          else if (processName === 'register_site_visit') navigateTo('siteVisit');
+          else if (processName === 'register_site_visit') {
+            navigateTo('siteVisit');
+            loadApplicationInfo(currentApplicationId);
+            loadSiteInfoToVisitForm(currentApplicationId);
+          }
           else if (processName === 'review') {
             navigateTo('review');
             loadReviewPhotos(currentApplicationId);
@@ -503,6 +518,83 @@ async function loadTodoTasks() {
     } else {
       console.error('Error loading tasks:', err);
     }
+  }
+}
+
+// --- Site Visit Screen: Load application info into accordion ---
+async function loadApplicationInfo(applicationId) {
+  if (!applicationId) return;
+
+  // Reset fields to loading state
+  ['ai-reference-no', 'ai-no-fail', 'ai-tajuk', 'ai-lokasi', 'ai-developer-name', 'ai-developer-address']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '...'; });
+
+  // Reset map link for new load
+  const mapLink        = document.getElementById('view-map-link');
+  const mapPlaceholder = document.getElementById('view-map-placeholder');
+  if (mapLink) { mapLink.href = '#'; mapLink.classList.add('hidden'); mapLink.classList.remove('flex'); }
+  if (mapPlaceholder) mapPlaceholder.classList.remove('hidden');
+
+  // Collapse accordion on new load
+  const body    = document.getElementById('app-info-body');
+  const chevron = document.getElementById('app-info-chevron');
+  const toggle  = document.getElementById('app-info-toggle');
+  if (body) body.classList.add('hidden');
+  if (chevron) chevron.style.transform = '';
+  if (toggle) toggle.setAttribute('aria-expanded', 'false');
+
+  try {
+    const app = await apiFetch(`/applications/${applicationId}`);
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+    set('ai-reference-no',       app.reference_no);
+    set('ai-no-fail',            app.no_fail);
+    set('ai-tajuk',              app.tajuk);
+    set('ai-lokasi',             app.lokasi);
+    set('ai-developer-name',     app.developer_name);
+    set('ai-developer-address',  app.developer_address);
+
+    // Auto-expand accordion to surface the info
+    if (body) body.classList.remove('hidden');
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+    if (toggle) toggle.setAttribute('aria-expanded', 'true');
+  } catch (err) {
+    ['ai-reference-no', 'ai-no-fail', 'ai-tajuk', 'ai-lokasi', 'ai-developer-name', 'ai-developer-address']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
+    console.warn('Could not load application info:', err.message);
+  }
+}
+
+// --- Site Visit Screen: Pre-fill MapInfo from registered site data ---
+async function loadSiteInfoToVisitForm(applicationId) {
+  if (!applicationId) return;
+  try {
+    const site = await apiFetch(`/sites/${applicationId}`);
+    const fieldMap = {
+      'visit-lot':          site.lot,
+      'visit-lembaran':     site.lembaran,
+      'visit-kategori':     site.kategori_tanah,
+      'visit-status-tanah': site.status_tanah,
+    };
+    Object.entries(fieldMap).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el && value) el.value = value;
+    });
+
+    // Google Maps link from coordinates stored in google_lat ("lat, lng" string)
+    const mapLink        = document.getElementById('view-map-link');
+    const mapPlaceholder = document.getElementById('view-map-placeholder');
+    if (site.google_lat && site.google_lat.trim()) {
+      const query = encodeURIComponent(site.google_lat.trim());
+      if (mapLink) {
+        mapLink.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
+        mapLink.classList.remove('hidden');
+        mapLink.classList.add('flex');
+      }
+      if (mapPlaceholder) mapPlaceholder.classList.add('hidden');
+    }
+  } catch (err) {
+    // Site may not exist yet or request failed; fields stay blank
+    console.warn('Could not load site info:', err.message);
   }
 }
 
