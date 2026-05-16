@@ -1,0 +1,1363 @@
+openapi: 3.0.3
+
+info:
+  title: SVRMS API Services
+  description: |
+    Site Visit & Review Management System (SVRMS) — Backend API Services
+
+    This API acts as the communication bridge between the PWA frontend and the
+    Laravel backend system. It handles authentication, data retrieval, data
+    submission (including image uploads), and offline data synchronisation.
+
+    ## Workflow
+    ```
+    Login → Todo List → (based on status)
+      RECORDED               → Register Site    (POST /sites)
+      RECORDED (site exists) → Site Visit Form  (POST /site-visits)
+      SITE_VISIT_IN_PROGRESS → Review Page      (POST /reviews)
+    ```
+
+    ## Offline Support
+    When the PWA detects no internet, submissions are stored in Local Storage.
+    Once connectivity is restored, call `POST /sync` to upload pending records.
+
+    ## Authentication
+    All protected endpoints require a JWT Bearer token obtained from `POST /auth/login`.
+  version: "1.0.0"
+  contact:
+    name: SVRMS Development Team
+  license:
+    name: Internal Use Only
+
+servers:
+  - url: https://api.svrms.gov.my/v1
+    description: Production Server
+  - url: https://staging-api.svrms.gov.my/v1
+    description: Staging Server
+  - url: http://localhost:3000/v1
+    description: Local Development
+
+tags:
+  - name: Authentication
+    description: Login and token management
+  - name: Todo / Dashboard
+    description: Officer's task list filtered by application status
+  - name: Register Site
+    description: CRUD operations for site registration (sites table)
+  - name: Site Visit
+    description: CRUD operations for site visit records (site_visits table)
+  - name: Review
+    description: CRUD operations for officer review submissions (reviews table)
+  - name: Offline Sync
+    description: Batch upload of records stored in Local Storage while offline
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECURITY SCHEMES
+# ─────────────────────────────────────────────────────────────────────────────
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from POST /auth/login. Expires after 8 hours.
+
+  # ─── REUSABLE SCHEMAS ──────────────────────────────────────────────────────
+  schemas:
+
+    # --- Auth ---
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: ahmad.fadzil@mpj.gov.my
+          description: Officer's username or email address
+        password:
+          type: string
+          format: password
+          example: "P@ssw0rd123"
+          description: Officer's password (transmitted over HTTPS)
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: JWT Bearer token (valid for 8 hours)
+        user:
+          type: object
+          properties:
+            user_id:
+              type: integer
+              example: 5
+            name:
+              type: string
+              example: Ahmad Fadzil
+            role:
+              type: string
+              example: officer
+            department:
+              type: string
+              example: Perancangan
+
+    # --- Todo ---
+    TodoResponse:
+      type: object
+      properties:
+        officer:
+          type: object
+          properties:
+            user_id:
+              type: integer
+              example: 5
+            name:
+              type: string
+              example: Ahmad Fadzil
+        total:
+          type: integer
+          example: 3
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/TodoItem'
+
+    TodoItem:
+      type: object
+      properties:
+        application_id:
+          type: integer
+          example: 101
+        officer_id:
+          type: integer
+          example: 5
+        reference_no:
+          type: string
+          example: MPJ/2025/001
+        developer_id:
+          type: integer
+          example: 12
+        developer_name:
+          type: string
+          example: Syarikat ABC Sdn Bhd
+        tajuk:
+          type: string
+          example: Taman Maju Jaya
+        lokasi:
+          type: string
+          example: Mukim Sg. Petani
+        no_fail:
+          type: string
+          example: JPN/2025/101
+        status:
+          type: string
+          enum: [RECORDED, SITE_VISIT_IN_PROGRESS, PENDING_VERIFICATION]
+          example: RECORDED
+
+    # --- Site ---
+    SiteRequest:
+      type: object
+      required:
+        - application_id
+        - mukim
+        - bpk
+        - luas
+        - lot
+        - kategori_tanah
+        - status_tanah
+        - google_lat
+      properties:
+        application_id:
+          type: integer
+          example: 101
+        mukim:
+          type: string
+          example: Mukim Sg. Petani
+        bpk:
+          type: string
+          example: BPK Kuala Muda
+          description: Bahagian Pentadbiran Kecil
+        luas:
+          type: number
+          format: float
+          example: 2.5
+          description: Land area (Hectares / Acres)
+        lot:
+          type: string
+          example: LOT 4521
+        lembaran:
+          type: string
+          example: "3"
+          description: Sheet reference
+        google_lat:
+          type: string
+          example: "5.9788, 116.0735"
+          description: GPS coordinates / Locations string
+        kategori_tanah:
+          type: string
+          example: Tanah Pertanian
+        status_tanah:
+          type: string
+          example: Milik
+
+    SiteResponse:
+      type: object
+      properties:
+        site_id:
+          type: integer
+          example: 45
+        application_id:
+          type: integer
+          example: 101
+        mukim:
+          type: string
+          example: Mukim Sg. Petani
+        bpk:
+          type: string
+          example: BPK Kuala Muda
+        luas:
+          type: number
+          example: 2.5
+        lot:
+          type: string
+          example: LOT 4521
+        lembaran:
+          type: string
+          example: "3"
+        google_lat:
+          type: string
+          example: "5.9788, 116.0735"
+        kategori_tanah:
+          type: string
+          example: Tanah Pertanian
+        status_tanah:
+          type: string
+          example: Milik
+        status:
+          type: string
+          example: REGISTERED
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-06-15T08:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-06-15T08:30:00Z"
+
+    SiteCreateSuccess:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Site berjaya didaftarkan. Langkah seterusnya ialah lawatan tapak."
+        site_id:
+          type: integer
+          example: 45
+        application_status:
+          type: string
+          example: RECORDED
+
+    # --- Site Visit ---
+    SiteVisitResponse:
+      type: object
+      properties:
+        site_visit_id:
+          type: integer
+          example: 88
+        application_id:
+          type: integer
+          example: 101
+        officer_id:
+          type: integer
+          example: 5
+        visit_date:
+          type: string
+          format: date
+          example: "2025-06-15"
+        finding_north:
+          type: string
+          example: Sempadan utara berbatasan dengan jalan raya
+        photos_north:
+          type: array
+          items:
+            type: string
+          example: ["/storage/site_visits/101/north_1.jpg"]
+        findings_south:
+          type: string
+          example: Sempadan selatan berbatasan dengan sungai
+        photos_south:
+          type: array
+          items:
+            type: string
+          example: ["/storage/site_visits/101/south_1.jpg"]
+        findings_east:
+          type: string
+          example: Sempadan timur berbatasan dengan ladang
+        photo_east:
+          type: array
+          items:
+            type: string
+          example: ["/storage/site_visits/101/east_1.jpg"]
+        finding_west:
+          type: string
+          example: Sempadan barat berbatasan dengan kawasan perumahan
+        photo_west:
+          type: array
+          items:
+            type: string
+          example: ["/storage/site_visits/101/west_1.jpg"]
+        activity:
+          type: string
+          example: Tanah kosong tidak diusahakan
+        facility:
+          type: string
+          example: Tiada kemudahan sedia ada
+        entrance_way:
+          type: string
+          example: Akses melalui Jalan Maju 5
+        parit:
+          type: string
+          example: Terdapat parit di sempadan utara
+        tree:
+          type: string
+          example: Pokok getah terbiar
+        topography:
+          type: string
+          example: Rata dan sedikit berbukit di bahagian timur
+        land_use_zone:
+          type: string
+          example: Zon Perumahan
+        density:
+          type: string
+          example: Sederhana
+        recommend_road:
+          type: integer
+          example: 1
+          description: "1=Yes, 0=No"
+        anjakan:
+          type: string
+          example: Anjakan 6m dari sempadan jalan
+        social_facility:
+          type: string
+          example: Taman permainan dan surau
+        location_data:
+          type: string
+          example: '{"lat":5.9788,"lng":116.0735}'
+        attachments:
+          type: string
+          example: /storage/site_visits/101/attachment_1.pdf
+        status:
+          type: string
+          enum: [DRAFT, COMPLETED]
+          example: COMPLETED
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-06-15T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-06-15T10:00:00Z"
+
+    SiteVisitSubmitSuccess:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Lawatan tapak berjaya dihantar. Sila lengkapkan ulasan."
+        site_visit_id:
+          type: integer
+          example: 88
+        application_status:
+          type: string
+          enum: [SITE_VISIT_IN_PROGRESS, RECORDED]
+          example: SITE_VISIT_IN_PROGRESS
+
+    # --- Review ---
+    ReviewRequest:
+      type: object
+      required:
+        - application_id
+        - officer_id
+        - review_content
+        - recommendation
+        - self_check_completed
+      properties:
+        application_id:
+          type: integer
+          example: 101
+        officer_id:
+          type: integer
+          example: 5
+          description: Officer ID — should match token user_id
+        review_content:
+          type: string
+          example: "Tapak cadangan adalah sesuai untuk pembangunan perumahan kos sederhana..."
+        recommendation:
+          type: string
+          enum: [SUPPORTED, NOT_SUPPORTED]
+          example: SUPPORTED
+        self_check_completed:
+          type: boolean
+          example: true
+          description: Officer confirms all self-checklist items are completed
+
+    ReviewResponse:
+      type: object
+      properties:
+        review_id:
+          type: integer
+          example: 33
+        application_id:
+          type: integer
+          example: 101
+        officer_id:
+          type: integer
+          example: 5
+        review_content:
+          type: string
+          example: "Tapak cadangan adalah sesuai..."
+        recommendation:
+          type: string
+          example: Lulus
+        self_check_completed:
+          type: boolean
+          example: true
+        submitted_at:
+          type: string
+          format: date-time
+          example: "2025-06-20T10:30:00Z"
+        status:
+          type: string
+          example: PENDING_VERIFICATION
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-06-20T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-06-20T10:30:00Z"
+
+    ReviewSubmitSuccess:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Ulasan berjaya dihantar kepada Penolong Pengarah untuk pengesahan."
+        review_id:
+          type: integer
+          example: 33
+        application_status:
+          type: string
+          example: PENDING_VERIFICATION
+
+    # --- Sync ---
+    SyncRequest:
+      type: object
+      required: [records]
+      properties:
+        records:
+          type: array
+          items:
+            type: object
+            required: [type, payload, local_id, created_offline_at]
+            properties:
+              type:
+                type: string
+                enum: [site, site_visit, review]
+                example: site
+              payload:
+                type: object
+                description: The full request body for the corresponding endpoint
+                example:
+                  application_id: 101
+                  mukim: Mukim Sg. Petani
+                  bpk: BPK Kuala Muda
+                  luas: 2.5
+                  nofail: JPN/2025/101
+                  lot: LOT 4521
+                  kategori_tanah: Tanah Pertanian
+                  status_tanah: Milik
+                  lokasi: Jalan Maju 5
+              local_id:
+                type: string
+                example: ls_001
+                description: Client-generated unique ID for tracking this offline record
+              created_offline_at:
+                type: string
+                format: date-time
+                example: "2025-06-18T08:00:00Z"
+                description: Timestamp when the record was saved offline
+
+    SyncResponse:
+      type: object
+      properties:
+        synced:
+          type: integer
+          example: 2
+        failed:
+          type: integer
+          example: 0
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              local_id:
+                type: string
+                example: ls_001
+              status:
+                type: string
+                enum: [success, failed]
+                example: success
+              server_id:
+                type: integer
+                example: 45
+                description: The server-assigned ID for the created record
+              error:
+                type: string
+                example: null
+                description: Error message if status is 'failed'
+
+    # --- Generic ---
+    SuccessMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Operation successful."
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Human-readable error message."
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        details:
+          type: object
+          nullable: true
+          example:
+            field: application_id
+            issue: required
+
+  # ─── REUSABLE RESPONSES ────────────────────────────────────────────────────
+  responses:
+    Unauthorized:
+      description: Invalid or expired JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Invalid or expired token."
+            code: UNAUTHORIZED
+
+    NotFound:
+      description: Requested resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Record not found."
+            code: NOT_FOUND
+
+    BadRequest:
+      description: Validation error — missing or invalid fields
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Validation failed."
+            code: VALIDATION_ERROR
+            details:
+              field: application_id
+              issue: required
+
+    Forbidden:
+      description: Action not permitted (e.g. editing a locked review)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Record is locked and cannot be modified."
+            code: FORBIDDEN
+
+    ServerError:
+      description: Unexpected internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Internal server error. Please try again later."
+            code: INTERNAL_ERROR
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PATHS
+# ─────────────────────────────────────────────────────────────────────────────
+paths:
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # AUTH
+  # ══════════════════════════════════════════════════════════════════════════
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Officer Login
+      description: |
+        Authenticates the officer using username and password.
+        - Queries the `users` table: `WHERE email = username AND role = 'officer' AND is_active = 1`
+        - Compares password using bcrypt
+        - Returns a JWT token on success (expires in 8 hours)
+        - Returns 401 if credentials are invalid or role is not `officer`
+      operationId: loginOfficer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        "200":
+          description: Login successful — returns JWT and user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          description: Invalid credentials or role is not officer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid credentials or insufficient role."
+                code: UNAUTHORIZED
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # TODO / DASHBOARD
+  # ══════════════════════════════════════════════════════════════════════════
+  /todo:
+    get:
+      tags: [Todo / Dashboard]
+      summary: Get Officer Todo List
+      description: |
+        Returns all applications assigned to the logged-in officer with status
+        in `recorded`, `site_visit`, or `review`.
+
+        **Routing logic (frontend):**
+        | status       | Destination              |
+        |--------------|--------------------------|
+        | recorded     | /register-site           |
+        | site_visit   | /site-visit              |
+        | review       | /review                  |
+
+        **SQL join:** `applications LEFT JOIN developers ON applications.developer_id = developers.developer_id`
+        **WHERE:** `officer_id = {token.user_id} AND status IN ('RECORDED','SITE_VISIT_IN_PROGRESS') AND is_active = 1`
+      operationId: getTodoList
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Filter by a specific status (omit to return all three)
+          schema:
+            type: string
+            enum: [RECORDED, SITE_VISIT_IN_PROGRESS]
+      responses:
+        "200":
+          description: Todo list retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # REGISTER SITE
+  # ══════════════════════════════════════════════════════════════════════════
+  /sites:
+    post:
+      tags: [Register Site]
+      summary: Register New Site
+      description: |
+        Registers a new site record for an application.
+        - Inserts a row into the `sites` table
+        - Updates `applications.status` from `RECORDED` → `SITE_VISIT_IN_PROGRESS` (only on site visit submit)
+        - Logs action in `audit_logs`
+      operationId: createSite
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteRequest'
+      responses:
+        "201":
+          description: Site registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteCreateSuccess'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "422":
+          description: Site already registered for this application
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "A site record already exists for this application."
+                code: DUPLICATE_RECORD
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  /sites/{application_id}:
+    get:
+      tags: [Register Site]
+      summary: Get Site by Application ID
+      description: Retrieves the site record linked to the specified application.
+      operationId: getSiteByApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 101
+      responses:
+        "200":
+          description: Site record retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  /sites/{site_id}:
+    put:
+      tags: [Register Site]
+      summary: Update Site Record
+      description: |
+        Updates an existing site record. All fields are optional — only supplied
+        fields are updated (partial update).
+      operationId: updateSite
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: site_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 45
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteRequest'
+      responses:
+        "200":
+          description: Site record updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+              example:
+                message: "Rekod tapak dikemaskini."
+                site_id: 45
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags: [Register Site]
+      summary: Delete Site Record
+      description: Soft-deletes a site record by setting `is_active = 0`.
+      operationId: deleteSite
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: site_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 45
+      responses:
+        "200":
+          description: Site record deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+              example:
+                message: "Rekod tapak dipadam."
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # SITE VISIT
+  # ══════════════════════════════════════════════════════════════════════════
+  /site-visits:
+    post:
+      tags: [Site Visit]
+      summary: Create Site Visit (Submit or Save Draft)
+      description: |
+        Creates a new site visit record. Use `action` field to control behaviour:
+
+        | action   | status set on application | HTTP response message                    |
+        |----------|---------------------------|------------------------------------------|
+        | `submit` | `SITE_VISIT_IN_PROGRESS`  | "Lawatan tapak berjaya dihantar..."      |
+        | `draft`  | `RECORDED`                | "Draf disimpan."                         |
+
+        **Photo upload:** Use `Content-Type: multipart/form-data` when including photos.
+        Photos are saved to `/storage/site_visits/{application_id}/` on the backend server.
+        File paths (not binary data) are stored in the database.
+      operationId: createSiteVisit
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - application_id
+                - officer_id
+                - visit_date
+                - finding_north
+                - findings_south
+                - findings_east
+                - finding_west
+                - activity
+                - facility
+                - entrance_way
+                - parit
+                - tree
+                - topography
+                - land_use_zone
+                - density
+                - recommend_road
+                - anjakan
+                - social_facility
+                - action
+              properties:
+                application_id:
+                  type: integer
+                  example: 101
+                officer_id:
+                  type: integer
+                  example: 5
+                  description: Must match the token user_id
+                visit_date:
+                  type: string
+                  format: date
+                  example: "2025-06-15"
+                finding_north:
+                  type: string
+                photos_north:
+                  type: string
+                  format: binary
+                findings_south:
+                  type: string
+                photos_south:
+                  type: string
+                  format: binary
+                findings_east:
+                  type: string
+                photo_east:
+                  type: string
+                  format: binary
+                finding_west:
+                  type: string
+                photo_west:
+                  type: string
+                  format: binary
+                activity:
+                  type: string
+                  example: Tanah kosong tidak diusahakan
+                facility:
+                  type: string
+                  example: Tiada kemudahan sedia ada
+                entrance_way:
+                  type: string
+                  example: Akses melalui Jalan Maju 5
+                parit:
+                  type: string
+                  example: Terdapat parit di sempadan utara
+                tree:
+                  type: string
+                  example: Pokok getah terbiar
+                topography:
+                  type: string
+                  example: Rata dan sedikit berbukit di bahagian timur
+                land_use_zone:
+                  type: string
+                  example: Zon Perumahan
+                density:
+                  type: string
+                  example: Sederhana
+                recommend_road:
+                  type: integer
+                  description: "1=Yes, 0=No"
+                anjakan:
+                  type: string
+                  example: Anjakan 6m dari sempadan jalan
+                social_facility:
+                  type: string
+                  example: Taman permainan dan surau
+                location_data:
+                  type: string
+                  example: '{"lat":5.9788,"lng":116.0735}'
+                  description: GPS coordinates as JSON string (optional)
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Additional attachment files (optional)
+                action:
+                  type: string
+                  enum: [submit, draft]
+                  example: submit
+                  description: "'submit' advances status to review; 'draft' keeps status as site_visit"
+      responses:
+        "201":
+          description: Site visit created (submitted or drafted)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteVisitSubmitSuccess'
+              examples:
+                submitted:
+                  summary: Submitted (advances to review)
+                  value:
+                    message: "Lawatan tapak berjaya dihantar. Sila lengkapkan ulasan."
+                    site_visit_id: 88
+                    application_status: SITE_VISIT_IN_PROGRESS
+                draft:
+                  summary: Saved as draft
+                  value:
+                    message: "Draf disimpan."
+                    site_visit_id: 88
+                    application_status: RECORDED
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  /site-visits/{application_id}:
+    get:
+      tags: [Site Visit]
+      summary: Get Site Visit by Application ID
+      description: Retrieves the site visit record for the given application, including resolved photo URLs.
+      operationId: getSiteVisitByApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 101
+      responses:
+        "200":
+          description: Site visit record retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteVisitResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  /site-visits/{site_visit_id}:
+    put:
+      tags: [Site Visit]
+      summary: Update Site Visit Record
+      description: |
+        Updates an existing site visit. Replaces photos if new files are uploaded.
+        The `action` field controls whether to keep draft or advance to review.
+      operationId: updateSiteVisit
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: site_visit_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 88
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                visit_date:
+                  type: string
+                  format: date
+                finding_north:
+                  type: string
+                photos_north:
+                  type: string
+                  format: binary
+                finding_south:
+                  type: string
+                photo_south:
+                  type: string
+                  format: binary
+                finding_east:
+                  type: string
+                photo_east:
+                  type: string
+                  format: binary
+                finding_west:
+                  type: string
+                photo_west:
+                  type: string
+                  format: binary
+                activity:
+                  type: string
+                facility:
+                  type: string
+                entrance_way:
+                  type: string
+                parit:
+                  type: string
+                tree:
+                  type: string
+                topography:
+                  type: string
+                land_use_zone:
+                  type: string
+                density:
+                  type: string
+                recommend_road:
+                  type: string
+                parking:
+                  type: string
+                anjakan:
+                  type: string
+                sosial_facility:
+                  type: string
+                location_data:
+                  type: string
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                action:
+                  type: string
+                  enum: [submit, draft]
+      responses:
+        "200":
+          description: Site visit updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+              example:
+                message: "Rekod lawatan tapak dikemaskini."
+                site_visit_id: 88
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags: [Site Visit]
+      summary: Delete Site Visit Record
+      description: Soft-deletes a site visit record.
+      operationId: deleteSiteVisit
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: site_visit_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 88
+      responses:
+        "200":
+          description: Site visit deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+              example:
+                message: "Rekod lawatan tapak dipadam."
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # REVIEW
+  # ══════════════════════════════════════════════════════════════════════════
+  /reviews:
+    post:
+      tags: [Review]
+      summary: Submit Review
+      description: |
+        Submits the officer's formal review and recommendation for an application.
+        - Inserts into `reviews` table with `submitted_at = NOW()`
+        - Updates `applications.status` → `PENDING_VERIFICATION`
+        - Logs action in `audit_logs`
+        - Triggers notification to Assistant Director (handled by backend)
+      operationId: submitReview
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+      responses:
+        "201":
+          description: Review submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewSubmitSuccess'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "422":
+          description: Review already submitted or application not in review status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Application is not in 'SITE_VISIT_IN_PROGRESS' status."
+                code: INVALID_STATUS
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  /reviews/{application_id}:
+    get:
+      tags: [Review]
+      summary: Get Review by Application ID
+      description: Retrieves the review record for the specified application.
+      operationId: getReviewByApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 101
+      responses:
+        "200":
+          description: Review record retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  /reviews/{review_id}:
+    put:
+      tags: [Review]
+      summary: Update Review
+      description: |
+        Updates a submitted review. Only permitted when the application status is
+        still `review` (not yet `verified` or `approved`). Returns 403 if locked.
+      operationId: updateReview
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 33
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+      responses:
+        "200":
+          description: Review updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+              example:
+                message: "Ulasan dikemaskini."
+                review_id: 33
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags: [Review]
+      summary: Delete Review
+      description: Soft-deletes a review record. Only allowed before verification.
+      operationId: deleteReview
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 33
+      responses:
+        "200":
+          description: Review deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+              example:
+                message: "Ulasan dipadam."
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # OFFLINE SYNC
+  # ══════════════════════════════════════════════════════════════════════════
+  /sync:
+    post:
+      tags: [Offline Sync]
+      summary: Sync Offline Local Storage Data
+      description: |
+        Batch uploads records that were saved to the browser's Local Storage
+        while the device was offline.
+
+        - Each record is processed sequentially based on its `type` field
+        - The same business logic and validation as individual POST endpoints applies
+        - Processing does **not** abort on first failure — all records are attempted
+        - Per-record success/failure is reported in the response
+        - Photo/file data must be base64-encoded within the payload for offline records
+      operationId: syncOfflineData
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncRequest'
+      responses:
+        "200":
+          description: Sync completed (check per-record results for individual failures)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+              examples:
+                allSuccess:
+                  summary: All records synced successfully
+                  value:
+                    synced: 2
+                    failed: 0
+                    results:
+                      - local_id: ls_001
+                        status: success
+                        server_id: 45
+                      - local_id: ls_002
+                        status: success
+                        server_id: 88
+                partialFailure:
+                  summary: One record failed
+                  value:
+                    synced: 1
+                    failed: 1
+                    results:
+                      - local_id: ls_001
+                        status: success
+                        server_id: 45
+                      - local_id: ls_002
+                        status: failed
+                        server_id: null
+                        error: "application_id 999 not found."
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          $ref: '#/components/responses/ServerError'

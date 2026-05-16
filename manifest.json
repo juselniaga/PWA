@@ -1,0 +1,17 @@
+{
+  "name": "Jasin Site Visit Management",
+  "short_name": "Jasin SVM",
+  "description": "Site Visit Management System for Majlis Perbandaran Jasin",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e0f24",
+  "theme_color": "#ec5b13",
+  "icons": [
+    {
+      "src": "https://lh3.googleusercontent.com/aida-public/AB6AXuDWwGR7DJvzhP62ZWPYWlNzsEj23ZgFasAa2ehNg6GvO6YGOpRt0ditv322jSi7Udy5ZgKXfq4Miy2F3MnfHx2yiCjbtVqoJhqCGx3VPPgWWb2zN1jXVv8xUa8EC5X6-YlK9XIU5-sOk8UHGoaivtkF9n3moBjXgoQ3vPDTsyHubWk665L1ImU7-3RIb1b66HCtMXCtwCn1Vkdb5ZBWET4OdeyGcY_yyKbyW0TB8So0VD4epZ0mO6_9kekWDHwEFk2Ez1CO20ZqmGlq",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

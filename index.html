@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Jasin Site Visit Management</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1e0f24" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+        rel="stylesheet" />
+</head>
+
+<body class="bg-slate-50 font-['Public_Sans',sans-serif] min-h-screen m-0 p-0 text-slate-900">
+    <div
+        class="w-full max-w-md mx-auto bg-white min-h-screen relative flex flex-col shadow-2xl overflow-x-hidden md:border-x border-slate-200">
+
+
+
+
+        <!-- Login Screen -->
+        <div id="login-screen" class="flex flex-col h-full">
+            <!-- Header -->
+            <div class="flex items-center bg-white px-6 pt-4 pb-2 justify-between shrink-0">
+                <h2
+                    class="text-slate-900 text-lg font-extrabold leading-tight tracking-tight flex-1 text-center uppercase">
+                    MP Jasin</h2>
+            </div>
+
+            <!-- Banner Image -->
+            <div class="px-6 py-2 shrink-0">
+                <div class="w-full bg-center bg-no-repeat bg-cover flex flex-col justify-end overflow-hidden rounded-2xl h-[160px] shadow-sm border border-slate-100"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWwGR7DJvzhP62ZWPYWlNzsEj23ZgFasAa2ehNg6GvO6YGOpRt0ditv322jSi7Udy5ZgKXfq4Miy2F3MnfHx2yiCjbtVqoJhqCGx3VPPgWWb2zN1jXVv8xUa8EC5X6-YlK9XIU5-sOk8UHGoaivtkF9n3moBjXgoQ3vPDTsyHubWk665L1ImU7-3RIb1b66HCtMXCtwCn1Vkdb5ZBWET4OdeyGcY_yyKbyW0TB8So0VD4epZ0mO6_9kekWDHwEFk2Ez1CO20ZqmGlq");'>
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="px-6 pt-4 pb-2 shrink-0">
+                <h2 class="text-slate-900 tracking-tight text-[28px] font-extrabold leading-tight text-center">Site
+                    Visit</h2>
+                <p class="text-slate-500 text-center mt-1 text-xs font-medium uppercase tracking-wide">Officer
+                    Authentication</p>
+            </div>
+
+            <!-- Form -->
+            <form id="login-form" class="flex flex-col gap-4 px-6 py-4">
+                <div class="flex flex-col w-full">
+                    <p class="text-slate-700 text-[10px] font-bold uppercase tracking-wider pb-1.5 ml-1">Username or
+                        Email</p>
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">person</span>
+                        <input id="username"
+                            class="flex w-full rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 border border-slate-200 bg-slate-50 h-12 placeholder:text-slate-400 pl-11 pr-4 text-sm font-medium transition-all"
+                            placeholder="Enter your username" type="text" required />
+                    </div>
+                </div>
+
+                <div class="flex flex-col w-full">
+                    <p class="text-slate-700 text-[10px] font-bold uppercase tracking-wider pb-1.5 ml-1">Password</p>
+                    <div class="flex w-full items-stretch rounded-xl relative">
+                        <span
+                            class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">lock</span>
+                        <input id="password"
+                            class="flex w-full rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 border border-slate-200 bg-slate-50 h-12 placeholder:text-slate-400 pl-11 pr-12 text-sm font-medium transition-all"
+                            placeholder="Enter your password" type="password" required />
+                        <button id="toggle-password"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                            type="button">
+                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <a class="text-indigo-600 text-[11px] font-bold hover:underline" href="#">Forgot Password?</a>
+                </div>
+
+                <div class="pt-4">
+                    <button
+                        class="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all shadow-lg active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+                        type="submit">
+                        Login
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-auto p-6 flex flex-col items-center gap-2">
+                <div class="h-[1px] w-12 bg-slate-200"></div>
+                <p class="text-slate-400 text-[9px] font-bold text-center uppercase tracking-tighter">
+                    © 2024 MP Jasin. All Rights Reserved.
+                </p>
+
+            </div>
+        </div>
+
+        <!-- Todo Screen -->
+        <div id="todo-screen" class="hidden flex flex-col h-full bg-slate-50">
+            <!-- Header -->
+            <header
+                class="px-6 pt-4 pb-2 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+                <button
+                    class="text-slate-400 hover:text-slate-600 transition-colors w-10 h-10 flex items-center justify-start">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <h1 class="text-sm font-extrabold text-slate-900 tracking-tight flex-1 text-center">Task Todo List</h1>
+                <button
+                    class="text-slate-400 hover:text-slate-600 transition-colors w-10 h-10 flex items-center justify-end">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+            </header>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-100 px-6 gap-6 bg-white shrink-0">
+                <button
+                    class="flex flex-col items-center justify-center border-b-[3px] border-indigo-600 text-indigo-600 pb-2 pt-3">
+                    <p class="text-[11px] font-bold uppercase tracking-wider">All Tasks</p>
+                </button>
+                <button
+                    class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-slate-400 pb-2 pt-3">
+                    <p class="text-[11px] font-bold uppercase tracking-wider">Pending</p>
+                </button>
+                <button
+                    class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-slate-400 pb-2 pt-3">
+                    <p class="text-[11px] font-bold uppercase tracking-wider">Completed</p>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <main class="flex-1 overflow-y-auto px-6 py-4 space-y-4 pb-24">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Today's Tasks</h3>
+
+                <!-- Task 1
+                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col gap-3">
+                    <div class="flex-1 flex flex-col">
+                        <div>
+                            <span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 text-[9px] font-bold uppercase tracking-wider">Register Site</span>
+                            <h4 class="text-sm font-bold text-slate-900 mt-1.5">Information Application</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Setup initial property details</p>
+                        </div>
+                        <button class="register-site-btn mt-4 bg-slate-900 text-white text-[11px] font-bold px-4 py-2 rounded-lg w-fit transition-transform active:scale-95">
+                            Register Site
+                        </button>
+                    </div>
+                </div> -->
+
+                <!-- Task 2 -->
+                <!-- <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col gap-3">
+                    <div class="flex-1 flex flex-col">
+                        <div>
+                            <span
+                                class="px-2 py-0.5 rounded bg-amber-50 text-amber-700 text-[9px] font-bold uppercase tracking-wider">Site
+                                Visit</span>
+                            <h4 class="text-sm font-bold text-slate-900 mt-1.5">Information Application</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5">On-site verification required</p>
+                        </div>
+                        <button
+                            class="site-visit-btn mt-4 bg-slate-900 text-white text-[11px] font-bold px-4 py-2 rounded-lg w-fit transition-transform active:scale-95">
+                            Site Visit
+                        </button>
+                    </div>
+                </div> -->
+
+                <!-- Task 3 -->
+                <!-- <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col gap-3">
+                    <div class="flex-1 flex flex-col">
+                        <div>
+                            <span
+                                class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold uppercase tracking-wider">Review</span>
+                            <h4 class="text-sm font-bold text-slate-900 mt-1.5">Information Application</h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Final audit of documentation</p>
+                        </div>
+                        <button
+                            class="review-task-btn mt-4 bg-slate-200 text-slate-600 text-[11px] font-bold px-4 py-2 rounded-lg w-fit transition-transform active:scale-95">
+                            Review Task
+                        </button>
+                    </div>
+                </div> -->
+            </main>
+
+            <!-- Navigation -->
+            <nav
+                class="absolute bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-100 flex items-center justify-around px-4 pb-4 shrink-0">
+                <div class="flex flex-col items-center gap-0.5 text-slate-400">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="text-[9px] font-bold uppercase">Home</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5 text-indigo-600">
+                    <span class="material-symbols-outlined font-variation-fill">task_alt</span>
+                    <span class="text-[9px] font-bold uppercase">Tasks</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5 text-slate-400">
+                    <span class="material-symbols-outlined">person</span>
+                    <span class="text-[9px] font-bold uppercase">Profile</span>
+                </div>
+                <button id="logout-btn"
+                    class="flex flex-col items-center gap-0.5 text-rose-500 hover:text-rose-600 transition-colors bg-transparent border-0 cursor-pointer">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="text-[9px] font-bold uppercase">Logout</span>
+                </button>
+
+            </nav>
+        </div>
+
+        <!-- Register Site Screen -->
+        <div id="register-site-screen" class="hidden flex flex-col h-full bg-slate-50">
+            <!-- Top App Bar -->
+            <div class="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-100 shrink-0">
+                <div class="flex items-center p-4 justify-between">
+                    <button id="back-to-todo"
+                        class="text-indigo-600 flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-indigo-50 transition-colors">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <h2 class="text-slate-900 text-lg font-extrabold leading-tight tracking-tight flex-1 text-center">
+                        Register Site</h2>
+                    <div class="size-10"></div> <!-- Spacer -->
+                </div>
+            </div>
+
+            <!-- Progress Tracker -->
+            <div class="px-6 py-4 shrink-0">
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-end">
+                        <div class="flex flex-col">
+                            <span
+                                class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest leading-none mb-1">Site
+                                Visit Form</span>
+                            <p class="text-slate-900 text-sm font-bold">Step 1: Basic Information</p>
+                        </div>
+                        <p class="text-slate-400 text-[10px] font-bold">1 of 5</p>
+                    </div>
+                    <div class="rounded-full bg-slate-200 h-1.5 w-full overflow-hidden">
+                        <div class="h-full rounded-full bg-indigo-600 transition-all duration-500" style="width: 20%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <main class="flex-1 overflow-y-auto px-6 pb-32 space-y-5">
+                <!-- Mukim Dropdown -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">Mukim</label>
+                    <div class="relative">
+                        <select id="reg-mukim"
+                            class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all appearance-none cursor-pointer">
+                            <option disabled selected value="">Select Mukim</option>
+                            <option value="jasin">Jasin</option>
+                            <option value="merlimau">Merlimau</option>
+                            <option value="bemban">Bemban</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+                    </div>
+                </div>
+
+                <!-- BPK Dropdown -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">BPK</label>
+                    <div class="relative">
+                        <select id="reg-bpk"
+                            class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all appearance-none cursor-pointer">
+                            <option disabled selected value="">Select BPK</option>
+                            <option value="bpk1">BPK 1.1 - Central</option>
+                            <option value="bpk2">BPK 2.4 - North</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+                    </div>
+                </div>
+
+                <!-- Lot Input -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">Lot</label>
+                    <input id="reg-lot"
+                        class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all placeholder:text-slate-400"
+                        placeholder="e.g. Lot 1234" type="text" />
+                </div>
+
+                <!-- Kategori Tanah Input -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">Kategori
+                        Tanah</label>
+                    <input id="reg-kategori"
+                        class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all placeholder:text-slate-400"
+                        placeholder="e.g. Pertanian / Pembangunan" type="text" />
+                </div>
+
+                <!-- Status Tanah Input -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">Status
+                        Tanah</label>
+                    <input id="reg-status-tanah"
+                        class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all placeholder:text-slate-400"
+                        placeholder="e.g. Pegangan Bebas" type="text" />
+                </div>
+
+                <!-- Lembaran Input -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">No.
+                        Lembaran</label>
+                    <input id="reg-lembaran"
+                        class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all placeholder:text-slate-400"
+                        placeholder="e.g. 3757" type="text" />
+                </div>
+
+                <!-- Map Section -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">
+                        <span class="material-symbols-outlined text-[14px] align-middle mr-1">location_on</span>
+                        Map View — MyLot JUPEM
+                    </label>
+                    <div class="w-full rounded-2xl border border-slate-200 overflow-hidden shadow-sm"
+                        style="height: 340px;">
+                        <iframe id="jupem-mylot-frame" src="https://jupem2u.kul.jupem.gov.my/mylot/negeri.html"
+                            title="MyLot JUPEM — Cari Lokasi Lot" width="100%" height="100%"
+                            style="border:none; display:block;" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <p class="text-[9px] text-slate-400 font-medium ml-1">
+                        Gunakan peta MyLot untuk cari dan sahkan lokasi lot. Koordinat akan diisi secara manual di
+                        bawah.
+                    </p>
+                </div>
+
+                <!-- Luas Lot Input -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">Luas Lot
+                        (m²)</label>
+                    <div class="relative">
+                        <input id="reg-luas"
+                            class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all placeholder:text-slate-400"
+                            placeholder="0.00" type="number" />
+                        <div
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] font-bold uppercase">
+                            m²</div>
+                    </div>
+                </div>
+
+                <!-- Google Lat (Location String) -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">Location /
+                        Coordinates</label>
+                    <div class="flex gap-2">
+                        <input id="reg-google-lat"
+                            class="flex-1 rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all placeholder:text-slate-400"
+                            placeholder="e.g. 5.9788, 116.0735" type="text" />
+                        <button id="reg-set-location-btn"
+                            class="size-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-md active:scale-95 transition-all">
+                            <span class="material-symbols-outlined text-[20px]">my_location</span>
+                        </button>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Bottom Action Area -->
+            <div
+                class="absolute bottom-0 left-0 right-0 p-6 bg-white/90 backdrop-blur-lg border-t border-slate-100 shrink-0">
+                <button id="register-site-action-btn"
+                    class="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm">
+                    <span>Register Site</span>
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Site Visit Screen -->
+        <div id="site-visit-screen" class="hidden flex flex-col h-full bg-slate-50">
+            <!-- Header -->
+            <div class="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-100 shrink-0">
+                <div class="flex items-center p-4 justify-between">
+                    <button id="back-from-visit"
+                        class="text-indigo-600 flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-indigo-50 transition-colors">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <div class="flex flex-col items-center flex-1">
+                        <h2 class="text-slate-900 text-sm font-extrabold leading-tight tracking-tight uppercase">Borang
+                            Lawatan</h2>
+                        <p class="text-[9px] text-slate-400 font-bold tracking-tighter uppercase">MPJ-JPB-01-K02-P00-L2
+                        </p>
+                    </div>
+                    <div class="size-10"></div> <!-- Spacer -->
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <main class="flex-1 overflow-y-auto px-6 py-6 space-y-8 pb-32">
+                <!-- Location & GPS -->
+                <section class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1 h-4 bg-indigo-600 rounded-full"></div>
+                        <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Lokasi & GPS</h3>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Coordinates (Lat,
+                            Lng)</label>
+                        <input id="visit-coordinates"
+                            class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-11 px-4 text-xs shadow-sm transition-all placeholder:text-slate-300"
+                            placeholder="5.9788, 116.0735" type="text" />
+                    </div>
+                    <button id="set-current-location-btn"
+                        class="w-full h-11 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-md shadow-indigo-100">
+                        <span class="material-symbols-outlined text-[18px]">my_location</span>
+                        Set Lokasi Semasa
+                    </button>
+                </section>
+
+                <!-- Maklumat MapInfo -->
+                <section class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1 h-4 bg-indigo-600 rounded-full"></div>
+                        <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Maklumat MapInfo</h3>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">No. Lot / PT</label>
+                            <input id="visit-lot"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-11 px-4 text-xs shadow-sm transition-all"
+                                placeholder="e.g. Lot 1234" type="text" />
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">No. Lembaran Peta</label>
+                            <input id="visit-lembaran"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-11 px-4 text-xs shadow-sm transition-all"
+                                placeholder="e.g. 3757" type="text" />
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Kategori
+                                Gunatanah</label>
+                            <input id="visit-kategori"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-11 px-4 text-xs shadow-sm transition-all"
+                                placeholder="e.g. Kediaman" type="text" />
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Status Tanah</label>
+                            <input id="visit-status-tanah"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-11 px-4 text-xs shadow-sm transition-all"
+                                placeholder="e.g. Pegangan Bebas" type="text" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Keadaan Sekitar -->
+                <section class="space-y-3">
+                    <!-- Section Header -->
+                    <div class="flex items-center gap-2">
+                        <div class="w-1 h-4 bg-indigo-600 rounded-full"></div>
+                        <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Keadaan Sekitar</h3>
+                    </div>
+
+                    <!-- Compass hint -->
+                    <p class="text-[10px] text-slate-400 font-medium ml-3">
+                        Ambil gambar untuk setiap arah mata angin dan isikan keterangan keadaan sekitar tapak.
+                    </p>
+
+                    <div class="space-y-3">
+
+                        <!-- ↑ UTARA -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <!-- Card header -->
+                            <div class="flex items-center gap-3 px-4 py-3 bg-indigo-50 border-b border-indigo-100">
+                                <div class="size-8 rounded-full bg-indigo-600 flex items-center justify-center shadow-sm shrink-0">
+                                    <span class="text-white text-[11px] font-black">U</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-indigo-700 text-[11px] font-black uppercase tracking-wider leading-none">Utara</p>
+                                    <p class="text-indigo-400 text-[9px] font-medium mt-0.5">Barat Laut — North</p>
+                                </div>
+                                <span id="badge-utara" class="hidden text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 items-center gap-1">
+                                    <span class="material-symbols-outlined text-[12px]">check_circle</span> Captured
+                                </span>
+                            </div>
+                            <!-- Card body -->
+                            <div class="p-4 space-y-3">
+                                <textarea id="visit-finding-north"
+                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-[56px] focus:border-indigo-300 focus:ring-0 transition-colors"
+                                    placeholder="Keterangan keadaan arah Utara..."></textarea>
+                                <!-- Hidden input -->
+                                <input type="file" id="photo-utara" accept="image/*" capture="environment" class="hidden" />
+                                <!-- Preview -->
+                                <div id="preview-utara" class="hidden rounded-xl overflow-hidden border border-slate-200 relative">
+                                    <img id="preview-utara-img" src="" alt="Foto Utara" class="w-full object-cover max-h-44" />
+                                    <button data-dir="utara" class="photo-remove-btn absolute top-2 right-2 size-7 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
+                                        <span class="material-symbols-outlined text-[15px]">close</span>
+                                    </button>
+                                </div>
+                                <!-- Capture zone -->
+                                <button data-target="photo-utara"
+                                    class="photo-capture-btn w-full border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/50 hover:bg-indigo-50 rounded-xl py-3 flex items-center justify-center gap-2 text-indigo-500 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-[0.98]">
+                                    <span class="material-symbols-outlined text-[20px]">add_a_photo</span>
+                                    Ambil Gambar — Utara
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ↓ SELATAN -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-amber-50 border-b border-amber-100">
+                                <div class="size-8 rounded-full bg-amber-500 flex items-center justify-center shadow-sm shrink-0">
+                                    <span class="text-white text-[11px] font-black">S</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-amber-700 text-[11px] font-black uppercase tracking-wider leading-none">Selatan</p>
+                                    <p class="text-amber-400 text-[9px] font-medium mt-0.5">Tenggara — South</p>
+                                </div>
+                                <span id="badge-selatan" class="hidden text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 items-center gap-1">
+                                    <span class="material-symbols-outlined text-[12px]">check_circle</span> Captured
+                                </span>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <textarea id="visit-findings-south"
+                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-[56px] focus:border-amber-300 focus:ring-0 transition-colors"
+                                    placeholder="Keterangan keadaan arah Selatan..."></textarea>
+                                <input type="file" id="photo-selatan" accept="image/*" capture="environment" class="hidden" />
+                                <div id="preview-selatan" class="hidden rounded-xl overflow-hidden border border-slate-200 relative">
+                                    <img id="preview-selatan-img" src="" alt="Foto Selatan" class="w-full object-cover max-h-44" />
+                                    <button data-dir="selatan" class="photo-remove-btn absolute top-2 right-2 size-7 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
+                                        <span class="material-symbols-outlined text-[15px]">close</span>
+                                    </button>
+                                </div>
+                                <button data-target="photo-selatan"
+                                    class="photo-capture-btn w-full border-2 border-dashed border-amber-200 hover:border-amber-400 bg-amber-50/50 hover:bg-amber-50 rounded-xl py-3 flex items-center justify-center gap-2 text-amber-500 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-[0.98]">
+                                    <span class="material-symbols-outlined text-[20px]">add_a_photo</span>
+                                    Ambil Gambar — Selatan
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- → TIMUR -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-emerald-50 border-b border-emerald-100">
+                                <div class="size-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-sm shrink-0">
+                                    <span class="text-white text-[11px] font-black">T</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-emerald-700 text-[11px] font-black uppercase tracking-wider leading-none">Timur</p>
+                                    <p class="text-emerald-400 text-[9px] font-medium mt-0.5">Utara Timur — East</p>
+                                </div>
+                                <span id="badge-timur" class="hidden text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 items-center gap-1">
+                                    <span class="material-symbols-outlined text-[12px]">check_circle</span> Captured
+                                </span>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <textarea id="visit-findings-east"
+                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-[56px] focus:border-emerald-300 focus:ring-0 transition-colors"
+                                    placeholder="Keterangan keadaan arah Timur..."></textarea>
+                                <input type="file" id="photo-timur" accept="image/*" capture="environment" class="hidden" />
+                                <div id="preview-timur" class="hidden rounded-xl overflow-hidden border border-slate-200 relative">
+                                    <img id="preview-timur-img" src="" alt="Foto Timur" class="w-full object-cover max-h-44" />
+                                    <button data-dir="timur" class="photo-remove-btn absolute top-2 right-2 size-7 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
+                                        <span class="material-symbols-outlined text-[15px]">close</span>
+                                    </button>
+                                </div>
+                                <button data-target="photo-timur"
+                                    class="photo-capture-btn w-full border-2 border-dashed border-emerald-200 hover:border-emerald-400 bg-emerald-50/50 hover:bg-emerald-50 rounded-xl py-3 flex items-center justify-center gap-2 text-emerald-600 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-[0.98]">
+                                    <span class="material-symbols-outlined text-[20px]">add_a_photo</span>
+                                    Ambil Gambar — Timur
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ← BARAT -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-violet-50 border-b border-violet-100">
+                                <div class="size-8 rounded-full bg-violet-600 flex items-center justify-center shadow-sm shrink-0">
+                                    <span class="text-white text-[11px] font-black">B</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-violet-700 text-[11px] font-black uppercase tracking-wider leading-none">Barat</p>
+                                    <p class="text-violet-400 text-[9px] font-medium mt-0.5">Barat Daya — West</p>
+                                </div>
+                                <span id="badge-barat" class="hidden text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 items-center gap-1">
+                                    <span class="material-symbols-outlined text-[12px]">check_circle</span> Captured
+                                </span>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <textarea id="visit-finding-west"
+                                    class="w-full rounded-xl border border-slate-100 bg-slate-50 text-slate-900 p-3 text-xs placeholder:text-slate-300 resize-none min-h-[56px] focus:border-violet-300 focus:ring-0 transition-colors"
+                                    placeholder="Keterangan keadaan arah Barat..."></textarea>
+                                <input type="file" id="photo-barat" accept="image/*" capture="environment" class="hidden" />
+                                <div id="preview-barat" class="hidden rounded-xl overflow-hidden border border-slate-200 relative">
+                                    <img id="preview-barat-img" src="" alt="Foto Barat" class="w-full object-cover max-h-44" />
+                                    <button data-dir="barat" class="photo-remove-btn absolute top-2 right-2 size-7 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all">
+                                        <span class="material-symbols-outlined text-[15px]">close</span>
+                                    </button>
+                                </div>
+                                <button data-target="photo-barat"
+                                    class="photo-capture-btn w-full border-2 border-dashed border-violet-200 hover:border-violet-400 bg-violet-50/50 hover:bg-violet-50 rounded-xl py-3 flex items-center justify-center gap-2 text-violet-600 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-[0.98]">
+                                    <span class="material-symbols-outlined text-[20px]">add_a_photo</span>
+                                    Ambil Gambar — Barat
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+
+                <!-- Aktiviti & Kemudahan -->
+                <section class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1 h-4 bg-indigo-600 rounded-full"></div>
+                        <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Aktiviti & Kemudahan</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">6. Aktiviti Sedia Ada
+                                Atas Tapak</label>
+                            <textarea id="visit-activity"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-[80px]"
+                                placeholder="Nyatakan aktiviti sediada..."></textarea>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">7. Kemudahan Sedia Ada
+                                Sekitar</label>
+                            <textarea id="visit-facility"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-[80px]"
+                                placeholder="e.g. Surau, Balairaya terhampir..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Infrastruktur & Topografi -->
+                <section class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1 h-4 bg-indigo-600 rounded-full"></div>
+                        <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Infrastruktur & Fizikal
+                        </h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">i. Jalan Masuk /
+                                Saiz</label>
+                            <input id="visit-entrance"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 h-11 px-4 text-xs shadow-sm"
+                                type="text" />
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">ii. Perparitan /
+                                Saliran</label>
+                            <input id="visit-parit"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 h-11 px-4 text-xs shadow-sm"
+                                type="text" />
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">iii. Pokok /
+                                Semak-Samun</label>
+                            <input id="visit-tree"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 h-11 px-4 text-xs shadow-sm"
+                                type="text" />
+                        </div>
+                        <div class="flex flex-col gap-1.5 mt-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1 font-extrabold">9.
+                                Topografi</label>
+                            <textarea id="visit-topography"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-[80px]"
+                                placeholder="Nyatakan keadaan rupa bumi tapak..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Semakan Teknikal -->
+                <section class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1 h-4 bg-indigo-600 rounded-full"></div>
+                        <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Semakan Teknikal</h3>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">i. Zon Gunatanah</label>
+                            <input id="visit-zone"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 h-11 px-4 text-xs shadow-sm"
+                                type="text" />
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">ii. Kepadatan</label>
+                            <input id="visit-density"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 h-11 px-4 text-xs shadow-sm"
+                                type="text" />
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">iii. Jalan (Perlu
+                                Lebar?)</label>
+                            <div
+                                class="flex items-center gap-3 bg-white rounded-xl border border-slate-200 h-11 px-4 shadow-sm">
+                                <input id="visit-recommend-road" type="checkbox"
+                                    class="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600/20" />
+                                <span class="text-xs text-slate-600">Ya, Perlu pelebaran jalan</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Lain-Lain -->
+                <section class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1 h-4 bg-indigo-600 rounded-full"></div>
+                        <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Lain-Lain</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">i. Anjakan</label>
+                            <input id="visit-anjakan"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 h-11 px-4 text-xs shadow-sm"
+                                type="text" />
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">ii. Kemudahan
+                                Sosial</label>
+                            <textarea id="visit-social"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-[60px]"
+                                placeholder="e.g. Kemudahan terdekat..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="pt-4 border-t border-slate-200">
+                    <p class="text-center text-[9px] text-slate-400 font-bold uppercase tracking-widest">© 2024 MP Jasin
+                        - Internal Use Only</p>
+                </div>
+            </main>
+
+            <!-- Bottom Action Area -->
+            <div
+                class="absolute bottom-0 left-0 right-0 p-6 bg-white/95 backdrop-blur-lg border-t border-slate-100 flex flex-col gap-2 shrink-0">
+                <div class="flex gap-2">
+                    <button id="save-draft-btn"
+                        class="flex-1 h-11 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm transition-all active:scale-[0.98] text-xs">
+                        Simpan Draf
+                    </button>
+                    <button id="save-btn"
+                        class="flex-1 h-11 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] text-xs">
+                        Simpan
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Review Page Screen -->
+        <div id="review-screen" class="hidden flex flex-col h-full bg-slate-50">
+            <!-- Header -->
+            <div class="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-100 shrink-0">
+                <div class="flex items-center p-4 justify-between">
+                    <button id="back-from-review"
+                        class="text-indigo-600 flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-indigo-50 transition-colors">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <div class="flex flex-col items-center flex-1">
+                        <h2 class="text-slate-900 text-sm font-extrabold leading-tight tracking-tight uppercase">Semak
+                            Lawatan Tapak</h2>
+                        <p class="text-[9px] text-slate-400 font-bold tracking-tighter uppercase">Review & Approval</p>
+                    </div>
+                    <button class="text-slate-400 p-2 rounded-full">
+                        <span class="material-symbols-outlined">more_vert</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Review Content -->
+            <main class="flex-1 overflow-y-auto px-6 py-6 space-y-8 pb-32">
+                <!-- Summary Card -->
+                <section class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-indigo-600 text-[20px]">analytics</span>
+                        <h3 class="text-slate-900 text-[13px] font-bold uppercase tracking-wider">Ringkasan Maklumat
+                        </h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-50 pb-3">
+                            <div class="space-y-0.5">
+                                <p class="text-indigo-600 text-[9px] font-bold uppercase tracking-widest">Lokasi</p>
+                                <p class="text-slate-900 text-xs font-bold">Puchong, Selangor</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-300 text-sm">location_on</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-50 pb-3">
+                            <div class="space-y-0.5">
+                                <p class="text-indigo-600 text-[9px] font-bold uppercase tracking-widest">Tarikh Lawatan
+                                </p>
+                                <p class="text-slate-900 text-xs font-bold">24 Okt 2023</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-300 text-sm">calendar_today</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-50 pb-3">
+                            <div class="space-y-0.5">
+                                <p class="text-indigo-600 text-[9px] font-bold uppercase tracking-widest">Kondisi Tapak
+                                </p>
+                                <p class="text-emerald-600 text-xs font-bold uppercase">Sangat Baik</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-300 text-sm">check_circle</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="space-y-0.5">
+                                <p class="text-indigo-600 text-[9px] font-bold uppercase tracking-widest">Infrastruktur
+                                </p>
+                                <p class="text-slate-900 text-xs font-bold">Lengkap (Jalan raya, perparitan)</p>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-300 text-sm">construction</span>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- Directional Photo Gallery -->
+                <section class="space-y-3" id="review-photo-gallery">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-indigo-600 text-[18px]">photo_library</span>
+                            <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Foto Tapak</h3>
+                        </div>
+                        <span id="review-photo-count" class="text-[9px] font-bold text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">0/4 diambil</span>
+                    </div>
+
+                    <!-- 2x2 compass grid -->
+                    <div class="grid grid-cols-2 gap-3" id="review-photos-grid">
+
+                        <!-- UTARA -->
+                        <div class="rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white" id="photo-card-north">
+                            <div class="flex items-center gap-2 px-3 py-2 bg-indigo-50 border-b border-indigo-100">
+                                <div class="size-5 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
+                                    <span class="text-white text-[8px] font-black">U</span>
+                                </div>
+                                <span class="text-indigo-700 text-[9px] font-black uppercase tracking-wider">Utara</span>
+                            </div>
+                            <div id="photo-slot-north" class="h-28 bg-slate-50 flex items-center justify-center relative">
+                                <div class="photo-placeholder flex flex-col items-center gap-1 text-slate-300">
+                                    <span class="material-symbols-outlined text-[28px]">add_a_photo</span>
+                                    <span class="text-[8px] font-bold uppercase tracking-wider">Tiada foto</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SELATAN -->
+                        <div class="rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white" id="photo-card-south">
+                            <div class="flex items-center gap-2 px-3 py-2 bg-amber-50 border-b border-amber-100">
+                                <div class="size-5 rounded-full bg-amber-500 flex items-center justify-center shrink-0">
+                                    <span class="text-white text-[8px] font-black">S</span>
+                                </div>
+                                <span class="text-amber-700 text-[9px] font-black uppercase tracking-wider">Selatan</span>
+                            </div>
+                            <div id="photo-slot-south" class="h-28 bg-slate-50 flex items-center justify-center relative">
+                                <div class="photo-placeholder flex flex-col items-center gap-1 text-slate-300">
+                                    <span class="material-symbols-outlined text-[28px]">add_a_photo</span>
+                                    <span class="text-[8px] font-bold uppercase tracking-wider">Tiada foto</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TIMUR -->
+                        <div class="rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white" id="photo-card-east">
+                            <div class="flex items-center gap-2 px-3 py-2 bg-emerald-50 border-b border-emerald-100">
+                                <div class="size-5 rounded-full bg-emerald-600 flex items-center justify-center shrink-0">
+                                    <span class="text-white text-[8px] font-black">T</span>
+                                </div>
+                                <span class="text-emerald-700 text-[9px] font-black uppercase tracking-wider">Timur</span>
+                            </div>
+                            <div id="photo-slot-east" class="h-28 bg-slate-50 flex items-center justify-center relative">
+                                <div class="photo-placeholder flex flex-col items-center gap-1 text-slate-300">
+                                    <span class="material-symbols-outlined text-[28px]">add_a_photo</span>
+                                    <span class="text-[8px] font-bold uppercase tracking-wider">Tiada foto</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BARAT -->
+                        <div class="rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white" id="photo-card-west">
+                            <div class="flex items-center gap-2 px-3 py-2 bg-violet-50 border-b border-violet-100">
+                                <div class="size-5 rounded-full bg-violet-600 flex items-center justify-center shrink-0">
+                                    <span class="text-white text-[8px] font-black">B</span>
+                                </div>
+                                <span class="text-violet-700 text-[9px] font-black uppercase tracking-wider">Barat</span>
+                            </div>
+                            <div id="photo-slot-west" class="h-28 bg-slate-50 flex items-center justify-center relative">
+                                <div class="photo-placeholder flex flex-col items-center gap-1 text-slate-300">
+                                    <span class="material-symbols-outlined text-[28px]">add_a_photo</span>
+                                    <span class="text-[8px] font-bold uppercase tracking-wider">Tiada foto</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- Fullscreen photo lightbox (hidden by default) -->
+                <div id="photo-lightbox" class="hidden fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
+                    <img id="lightbox-img" src="" alt="Foto besar" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl" />
+                    <button class="absolute top-4 right-4 size-9 bg-white/10 text-white rounded-full flex items-center justify-center" onclick="document.getElementById('photo-lightbox').classList.add('hidden')">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+
+
+                <!-- Review Section -->
+                <section class="space-y-5">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-indigo-600 text-[20px]">rate_review</span>
+                        <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Ulasan dan Syor</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Status Penilaian</label>
+                            <div class="relative">
+                                <select id="review-recommendation"
+                                    class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-xs shadow-sm appearance-none cursor-pointer">
+                                    <option value="SUPPORTED">Sokong</option>
+                                    <option value="NOT_SUPPORTED">Tidak Disokong</option>
+                                </select>
+                                <span
+                                    class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Ulasan Terperinci</label>
+                            <textarea id="review-content"
+                                class="w-full rounded-xl border-slate-200 bg-white text-slate-900 p-4 text-xs shadow-sm min-h-[120px] focus:border-indigo-600 focus:ring-indigo-600/20"
+                                placeholder="Masukkan ulasan profesional anda..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Self-Check Checklist -->
+                <section class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-indigo-600 text-[20px]">checklist</span>
+                        <h3 class="text-slate-900 text-xs font-bold uppercase tracking-widest">Semak Kendiri</h3>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-medium ml-1">Sila sahkan semua perkara berikut sebelum menghantar ulasan anda.</p>
+
+                    <div class="bg-indigo-50/60 border border-indigo-100 rounded-2xl p-4 space-y-4">
+
+                        <!-- Check 1 -->
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <div class="relative mt-0.5 shrink-0">
+                                <input type="checkbox" id="self-check-1" class="sr-only peer" />
+                                <div class="size-5 rounded-md border-2 border-slate-300 bg-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center transition-all">
+                                    <span class="material-symbols-outlined text-white text-[14px] hidden peer-checked:block check-icon">check</span>
+                                </div>
+                            </div>
+                            <span class="text-[11px] text-slate-700 font-medium leading-snug group-has-[:checked]:text-indigo-700 transition-colors">
+                                Saya telah menyemak semua dokumen yang dikemukakan dan gambar siasatan tapak.
+                            </span>
+                        </label>
+
+                        <!-- Check 2 -->
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <div class="relative mt-0.5 shrink-0">
+                                <input type="checkbox" id="self-check-2" class="sr-only peer" />
+                                <div class="size-5 rounded-md border-2 border-slate-300 bg-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center transition-all">
+                                    <span class="material-symbols-outlined text-white text-[14px] hidden peer-checked:block check-icon">check</span>
+                                </div>
+                            </div>
+                            <span class="text-[11px] text-slate-700 font-medium leading-snug group-has-[:checked]:text-indigo-700 transition-colors">
+                                Lokasi projek sepadan dengan koordinat permohonan yang dikemukakan.
+                            </span>
+                        </label>
+
+                        <!-- Check 3 -->
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <div class="relative mt-0.5 shrink-0">
+                                <input type="checkbox" id="self-check-3" class="sr-only peer" />
+                                <div class="size-5 rounded-md border-2 border-slate-300 bg-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center transition-all">
+                                    <span class="material-symbols-outlined text-white text-[14px] hidden peer-checked:block check-icon">check</span>
+                                </div>
+                            </div>
+                            <span class="text-[11px] text-slate-700 font-medium leading-snug group-has-[:checked]:text-indigo-700 transition-colors">
+                                Syor saya adalah berdasarkan sepenuhnya kepada prosedur operasi standard.
+                            </span>
+                        </label>
+
+                    </div>
+
+                    <!-- Progress indicator -->
+                    <div class="flex items-center gap-2 px-1">
+                        <div id="checklist-progress-bar" class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div id="checklist-progress-fill" class="h-full bg-indigo-500 rounded-full transition-all duration-300" style="width:0%"></div>
+                        </div>
+                        <span id="checklist-progress-label" class="text-[9px] font-bold text-slate-400 shrink-0">0 / 3</span>
+                    </div>
+                </section>
+
+            </main>
+
+            <!-- Bottom Navigation / Action -->
+            <div
+                class="absolute bottom-0 left-0 right-0 p-6 bg-white/95 backdrop-blur-md border-t border-slate-100 shrink-0">
+                <button id="submit-review-btn" disabled
+                    class="w-full h-12 bg-slate-200 text-slate-400 font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-widest cursor-not-allowed"
+                    title="Sila tandakan semua semak kendiri dahulu">
+                    <span class="material-symbols-outlined text-sm">lock</span>
+                    Hantar Ulasan
+                </button>
+                <div class="w-24 h-1 bg-slate-200 rounded-full mt-4 mx-auto"></div>
+            </div>
+        </div>
+        <!-- Global Toast -->
+        <div id="toast"
+            class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-xl transition-all opacity-0 pointer-events-none translate-y-4 z-50 whitespace-nowrap">
+            Message goes here
+        </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
