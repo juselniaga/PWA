@@ -12,6 +12,8 @@ export default defineConfig(({mode}) => {
       },
     },
     server: {
+
+	allowedHosts: ['msvrms.mpjasin.gov.my'],
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       hmr: process.env.DISABLE_HMR !== 'true',
     },

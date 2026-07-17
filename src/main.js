@@ -1,7 +1,11 @@
 import './index.css';
 
 // Dynamically use the current hostname to allow LAN testing (e.g., 192.168.x.x)
-const API_BASE_URL = `http://${window.location.hostname}:3001/v1`;
+//const API_BASE_URL = `http://${window.location.hostname}:3001/v1`;
+//const API_BASE_URL = `https://api.svrms.mpjasin.gov.my/v1;
+//const API_BASE_URL = `https://api.svrms.mpjasin.gov.my/v1`;
+const API_BASE_URL = `http://10.10.10.12:3001/v1`;
+
 
 // Helpers
 const showToast = (message) => {
