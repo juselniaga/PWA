@@ -1,10 +1,7 @@
 import './index.css';
 
-// Dynamically use the current hostname to allow LAN testing (e.g., 192.168.x.x)
-//const API_BASE_URL = `http://${window.location.hostname}:3001/v1`;
-//const API_BASE_URL = `https://api.svrms.mpjasin.gov.my/v1;
-//const API_BASE_URL = `https://api.svrms.mpjasin.gov.my/v1`;
-const API_BASE_URL = `http://10.10.10.12:3001/v1`;
+// Served through the proxy in vite.config.ts
+const API_BASE_URL = `/v1`;
 
 
 // Helpers
@@ -39,7 +36,16 @@ const apiFetch = async (endpoint, options = {}) => {
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
     const data = await response.json();
-    
+
+    // Session expired: go back to login. Offline records stay queued for the next login.
+    if (response.status === 401 && endpoint !== '/auth/login') {
+      localStorage.removeItem('svrms_token');
+      localStorage.removeItem('svrms_user');
+      navigateTo('login');
+      showToast('Session expired. Please log in again.');
+      throw { unauthorized: true, message: 'Session expired' };
+    }
+
     if (!response.ok) {
       throw new Error(data.error || 'API request failed');
     }
@@ -88,7 +94,7 @@ const syncOfflineData = async () => {
       localStorage.setItem('svrms_offline_queue', JSON.stringify(remaining));
       showToast(`Sync completed with ${data.failed} errors`);
     }
-    loadTodoTasks();
+    await loadTodoTasks();
   } catch (err) {
     console.log('Sync failed', err);
   }
@@ -116,8 +122,8 @@ const navigateTo = (screenName) => {
 // Application State
 let currentApplicationId = null;
 
-// Laravel serves photos from its public storage
-const LARAVEL_STORAGE = `http://${window.location.hostname}:8000/storage`;
+// Laravel serves photos from its public storage, through the proxy in vite.config.ts
+const LARAVEL_STORAGE = `/storage`;
 
 // Photos picked in the form, keyed by DB field name (photos_north, photos_south, photo_east, photo_west)
 const directionPhotos = {};
@@ -588,6 +594,7 @@ async function loadTodoTasks() {
       todoMain.innerHTML += '<p class="text-xs text-slate-400">No pending tasks.</p>';
     }
   } catch (err) {
+    if (err.unauthorized) throw err;
     if (err.offline) {
       todoMain.innerHTML += '<p class="text-xs text-rose-500">You are offline. Cannot load live tasks.</p>';
     } else {
