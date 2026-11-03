@@ -81,12 +81,14 @@ const syncOfflineData = async () => {
     if (data.failed === 0) {
       localStorage.removeItem('svrms_offline_queue');
       showToast('All offline data synced successfully!');
-      loadTodoTasks();
     } else {
+      // Keep failed records so they are retried rather than lost
+      const syncedIds = data.results.filter(r => r.status === 'success').map(r => r.local_id);
+      const remaining = getOfflineQueue().filter(record => !syncedIds.includes(record.local_id));
+      localStorage.setItem('svrms_offline_queue', JSON.stringify(remaining));
       showToast(`Sync completed with ${data.failed} errors`);
-      // In production, you'd filter out success records and keep failed ones
-      localStorage.removeItem('svrms_offline_queue');
     }
+    loadTodoTasks();
   } catch (err) {
     console.log('Sync failed', err);
   }
@@ -113,6 +115,102 @@ const navigateTo = (screenName) => {
 
 // Application State
 let currentApplicationId = null;
+
+// Laravel serves photos from its public storage
+const LARAVEL_STORAGE = `http://${window.location.hostname}:8000/storage`;
+
+// Photos picked in the form, keyed by DB field name (photos_north, photos_south, photo_east, photo_west)
+const directionPhotos = {};
+// URLs of photos already saved in a draft, keyed by DB field name
+const savedPhotoUrls = {};
+
+// Map: DB field name -> short alias used in HTML element IDs
+const dirAlias = {
+  photos_north: 'utara',
+  photos_south: 'selatan',
+  photo_east:   'timur',
+  photo_west:   'barat'
+};
+
+// Map: site visit form element ID -> DB column
+const visitFieldMap = {
+  'visit-coordinates':    'location_data',
+  'visit-finding-north':  'finding_north',
+  'visit-findings-south': 'findings_south',
+  'visit-findings-east':  'findings_east',
+  'visit-finding-west':   'finding_west',
+  'visit-activity':       'activity',
+  'visit-facility':       'facility',
+  'visit-entrance':       'entrance_way',
+  'visit-parit':          'parit',
+  'visit-tree':           'tree',
+  'visit-topography':     'topography',
+  'visit-zone':           'land_use_zone',
+  'visit-density':        'density',
+  'visit-anjakan':        'anjakan',
+  'visit-social':         'social_facility'
+};
+
+// DB stores JSON e.g. '["photos/filename.jpg"]' or null; returns the first path
+const firstPhotoPath = (value) => {
+  let paths = value;
+  if (typeof paths === 'string') {
+    try { paths = JSON.parse(paths); } catch { paths = null; }
+  }
+  return Array.isArray(paths) && paths.length > 0 ? paths[0] : null;
+};
+
+// Draw a direction photo card: a photo from a saved draft can only be replaced, not removed
+const renderDirectionPhoto = (dir, url, removable) => {
+  const alias   = dirAlias[dir];
+  const preview = document.getElementById(`preview-${alias}`);
+  const img     = document.getElementById(`preview-${alias}-img`);
+  const badge   = document.getElementById(`badge-${alias}`);
+  if (img) img.src = url || '';
+  preview?.classList.toggle('hidden', !url);
+  preview?.querySelector('.photo-remove-btn')?.classList.toggle('hidden', !removable);
+  badge?.classList.toggle('hidden', !url);
+  badge?.classList.toggle('flex', Boolean(url));
+};
+
+const clearPickedPhoto = (dir) => {
+  delete directionPhotos[dir];
+  const input = document.getElementById(`photo-${dirAlias[dir]}`);
+  if (input) input.value = '';
+};
+
+// Forms are shared between applications, so each must start empty
+const resetSiteVisitForm = () => {
+  [...Object.keys(visitFieldMap), 'visit-lot', 'visit-lembaran', 'visit-kategori', 'visit-status-tanah'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const road = document.getElementById('visit-recommend-road');
+  if (road) road.checked = false;
+  Object.keys(dirAlias).forEach(dir => {
+    clearPickedPhoto(dir);
+    delete savedPhotoUrls[dir];
+    renderDirectionPhoto(dir, null, false);
+  });
+};
+
+const resetRegisterSiteForm = () => {
+  ['reg-mukim', 'reg-bpk', 'reg-lot', 'reg-kategori', 'reg-status-tanah', 'reg-lembaran', 'reg-luas', 'reg-google-lat'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+};
+
+const resetReviewForm = () => {
+  const content = document.getElementById('review-content');
+  if (content) content.value = '';
+  const recommendation = document.getElementById('review-recommendation');
+  if (recommendation) recommendation.selectedIndex = 0;
+  const checks = ['self-check-1', 'self-check-2', 'self-check-3'].map(id => document.getElementById(id));
+  checks.forEach(el => { if (el) el.checked = false; });
+  // Let the checklist listener refresh its progress bar and submit button
+  checks[0]?.dispatchEvent(new Event('change'));
+};
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
@@ -178,15 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Back buttons ---
   document.getElementById('back-to-todo')?.addEventListener('click', () => navigateTo('todo'));
   document.getElementById('back-from-visit')?.addEventListener('click', () => navigateTo('todo'));
-  document.getElementById('back-from-review')?.addEventListener('click', () => {
-    // Reset checklist when leaving review screen
-    ['self-check-1','self-check-2','self-check-3'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.checked = false;
-    });
-    updateChecklistState();
-    navigateTo('todo');
-  });
+  document.getElementById('back-from-review')?.addEventListener('click', () => navigateTo('todo'));
 
   // --- Self-check checklist → gate submit button ---
   const SELF_CHECK_IDS = ['self-check-1', 'self-check-2', 'self-check-3'];
@@ -269,17 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('reg-set-location-btn')?.addEventListener('click', () => getGPSLocation('reg-google-lat'));
 
   // --- Directional Camera Capture ---
-  // Photo store keyed by DB field name (photos_north, photos_south, photo_east, photo_west)
-  const directionPhotos = {};
-
-  // Map: DB field name -> short alias used in HTML element IDs
-  const dirAlias = {
-    photos_north: 'utara',
-    photos_south: 'selatan',
-    photo_east:   'timur',
-    photo_west:   'barat'
-  };
-
   const setupPhotoCapture = (dir) => {
     const alias  = dirAlias[dir];
     const inputEl   = document.getElementById(`photo-${alias}`);
@@ -301,13 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
       directionPhotos[dir] = file;
 
       const reader = new FileReader();
-      reader.onload = (e) => {
-        imgEl.src = e.target.result;
-        previewEl.classList.remove('hidden');
-        // Show "Captured" badge in card header
-        const badge = document.getElementById(`badge-${alias}`);
-        if (badge) badge.classList.replace('hidden', 'flex');
-      };
+      reader.onload = (e) => renderDirectionPhoto(dir, e.target.result, true);
       reader.readAsDataURL(file);
     });
   };
@@ -321,16 +394,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const alias = removeBtn.getAttribute('data-dir'); // HTML still uses alias (utara etc.)
     // Find the DB field key from alias
     const dir = Object.keys(dirAlias).find(k => dirAlias[k] === alias);
-    if (dir) delete directionPhotos[dir];
-    const inputEl   = document.getElementById(`photo-${alias}`);
-    const previewEl = document.getElementById(`preview-${alias}`);
-    const imgEl     = document.getElementById(`preview-${alias}-img`);
-    if (inputEl)   inputEl.value = '';
-    if (imgEl)     imgEl.src = '';
-    if (previewEl) previewEl.classList.add('hidden');
-    // Hide badge
-    const badge = document.getElementById(`badge-${alias}`);
-    if (badge) badge.classList.replace('flex', 'hidden');
+    if (!dir) return;
+    clearPickedPhoto(dir);
+    // Fall back to the draft's saved photo, if any
+    renderDirectionPhoto(dir, savedPhotoUrls[dir], false);
   });
 
   // --- Form Actions ---
@@ -366,28 +433,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Site Visit
   const handleSiteVisitSubmit = async (action) => {
     const user = JSON.parse(localStorage.getItem('svrms_user'));
+    // Placeholders are for final submission only: a draft keeps blanks so it can be resumed
+    const isSubmit = action === 'submit';
+    const fieldValue = (id, placeholder = 'Tiada') => document.getElementById(id).value || (isSubmit ? placeholder : '');
     const payload = {
       application_id: currentApplicationId,
       officer_id: user.user_id,
       visit_date: new Date().toISOString().split('T')[0],
-      location_data: document.getElementById('visit-coordinates').value || '0.00, 0.00',
-      finding_north: document.getElementById('visit-finding-north').value || 'Tiada',
-      findings_south: document.getElementById('visit-findings-south').value || 'Tiada',
-      findings_east: document.getElementById('visit-findings-east').value || 'Tiada',
-      finding_west: document.getElementById('visit-finding-west').value || 'Tiada',
-      activity: document.getElementById('visit-activity').value || 'Tiada',
-      facility: document.getElementById('visit-facility').value || 'Tiada',
-      entrance_way: document.getElementById('visit-entrance').value || 'Tiada',
-      parit: document.getElementById('visit-parit').value || 'Tiada',
-      tree: document.getElementById('visit-tree').value || 'Tiada',
-      topography: document.getElementById('visit-topography').value || 'Tiada',
-      land_use_zone: document.getElementById('visit-zone').value || 'Tiada',
-      density: document.getElementById('visit-density').value || 'Tiada',
       recommend_road: document.getElementById('visit-recommend-road').checked ? 1 : 0,
-      anjakan: document.getElementById('visit-anjakan').value || 'Tiada',
-      social_facility: document.getElementById('visit-social').value || 'Tiada',
       action
     };
+    Object.entries(visitFieldMap).forEach(([id, column]) => {
+      payload[column] = fieldValue(id, id === 'visit-coordinates' ? '0.00, 0.00' : 'Tiada');
+    });
 
     try {
       // Create FormData to satisfy Multer backend
@@ -400,14 +458,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (directionPhotos.photo_east)   formData.append('photo_east',   directionPhotos.photo_east,   directionPhotos.photo_east.name);
       if (directionPhotos.photo_west)   formData.append('photo_west',   directionPhotos.photo_west,   directionPhotos.photo_west.name);
 
-      await apiFetch('/site-visits', {
+      const saved = await apiFetch('/site-visits', {
         method: 'POST',
         body: formData
       });
       showToast(action === 'submit' ? 'Record sent for review' : 'Draft saved');
       if (action === 'submit') {
+        resetSiteVisitForm();
         await loadTodoTasks();
         navigateTo('todo');
+      } else {
+        // Picked photos are now on the server; don't upload them again on the next save
+        Object.keys(dirAlias).forEach(dir => {
+          clearPickedPhoto(dir);
+          applySavedPhoto(dir, saved.photos?.[dir]);
+        });
       }
     } catch (err) {
       if (err.offline) {
@@ -501,13 +566,19 @@ async function loadTodoTasks() {
         btn.addEventListener('click', (e) => {
           currentApplicationId = e.target.getAttribute('data-id');
           const processName = e.target.getAttribute('data-process');
-          if (processName === 'register_site') navigateTo('registerSite');
+          if (processName === 'register_site') {
+            resetRegisterSiteForm();
+            navigateTo('registerSite');
+          }
           else if (processName === 'register_site_visit') {
+            resetSiteVisitForm();
             navigateTo('siteVisit');
             loadApplicationInfo(currentApplicationId);
             loadSiteInfoToVisitForm(currentApplicationId);
+            loadSiteVisitDraft(currentApplicationId);
           }
           else if (processName === 'review') {
+            resetReviewForm();
             navigateTo('review');
             loadReviewPhotos(currentApplicationId);
           }
@@ -602,12 +673,42 @@ async function loadSiteInfoToVisitForm(applicationId) {
   }
 }
 
+// --- Site Visit Screen: Remember and show a photo saved on the server ---
+function applySavedPhoto(dir, value) {
+  const path = firstPhotoPath(value);
+  if (path) savedPhotoUrls[dir] = `${LARAVEL_STORAGE}/${path}`;
+  renderDirectionPhoto(dir, savedPhotoUrls[dir], false);
+}
+
+// --- Site Visit Screen: Resume a saved draft ---
+async function loadSiteVisitDraft(applicationId) {
+  if (!applicationId) return;
+  try {
+    const visit = await apiFetch(`/site-visits/${applicationId}`);
+    // The officer may have opened another application while this was loading
+    if (applicationId !== currentApplicationId) return;
+
+    Object.entries(visitFieldMap).forEach(([id, column]) => {
+      const el = document.getElementById(id);
+      if (el && visit[column] && !el.value) el.value = visit[column];
+    });
+    const road = document.getElementById('visit-recommend-road');
+    if (road) road.checked = Boolean(visit.recommend_road);
+    Object.keys(dirAlias).forEach(dir => {
+      // A photo picked while this was loading stays on screen
+      const path = firstPhotoPath(visit[dir]);
+      if (path) savedPhotoUrls[dir] = `${LARAVEL_STORAGE}/${path}`;
+      if (!directionPhotos[dir]) renderDirectionPhoto(dir, savedPhotoUrls[dir], false);
+    });
+  } catch (err) {
+    // No draft yet (404) or request failed; the form stays blank
+    console.warn('Could not load site visit draft:', err.message);
+  }
+}
+
 // --- Review Screen: Load directional photos from site visit ---
 async function loadReviewPhotos(applicationId) {
   if (!applicationId) return;
-
-  // Laravel serves photos from its public storage
-  const LARAVEL_STORAGE = `http://${window.location.hostname}:8000/storage`;
 
   // Map: API field name -> photo slot element ID
   const dirMap = [
@@ -639,15 +740,11 @@ async function loadReviewPhotos(applicationId) {
       const slot = document.getElementById(slotId);
       if (!slot) return;
 
-      // DB stores JSON string e.g. '["photos/filename.jpg"]' or null
-      let paths = visit[field];
-      if (typeof paths === 'string') {
-        try { paths = JSON.parse(paths); } catch { paths = null; }
-      }
+      const path = firstPhotoPath(visit[field]);
 
-      if (Array.isArray(paths) && paths.length > 0) {
+      if (path) {
         captured++;
-        const photoUrl = `${LARAVEL_STORAGE}/${paths[0]}`;
+        const photoUrl = `${LARAVEL_STORAGE}/${path}`;
         slot.innerHTML = `
           <img
             src="${photoUrl}"
