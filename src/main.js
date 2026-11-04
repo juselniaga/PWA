@@ -218,6 +218,91 @@ const resetReviewForm = () => {
   checks[0]?.dispatchEvent(new Event('change'));
 };
 
+// --- Keep an open site visit form across page reloads ---
+// Phones can discard the page while the camera is open, so unsaved text and photos
+// are kept locally until they are saved to the server.
+const VISIT_FORM_KEY = 'svrms_visit_form';
+
+const openPhotoDb = () => new Promise((resolve, reject) => {
+  const request = indexedDB.open('svrms_photos', 1);
+  request.onupgradeneeded = () => request.result.createObjectStore('picked');
+  request.onsuccess = () => resolve(request.result);
+  request.onerror = () => reject(request.error);
+});
+
+const withPhotoStore = async (mode, work) => {
+  const db = await openPhotoDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('picked', mode);
+    const request = work(tx.objectStore('picked'));
+    tx.oncomplete = () => { db.close(); resolve(request.result); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+  });
+};
+
+const keepPickedPhoto = (dir, file) =>
+  withPhotoStore('readwrite', store => store.put(file, dir)).catch(err => console.warn('Could not keep photo:', err));
+
+const forgetPickedPhoto = (dir) =>
+  withPhotoStore('readwrite', store => store.delete(dir)).catch(err => console.warn('Could not forget photo:', err));
+
+const forgetPickedPhotos = () =>
+  withPhotoStore('readwrite', store => store.clear()).catch(err => console.warn('Could not forget photos:', err));
+
+const saveVisitFormState = () => {
+  if (!currentApplicationId || screens.siteVisit?.classList.contains('hidden')) return;
+  const fields = {};
+  Object.keys(visitFieldMap).forEach(id => { fields[id] = document.getElementById(id)?.value || ''; });
+  localStorage.setItem(VISIT_FORM_KEY, JSON.stringify({
+    applicationId: currentApplicationId,
+    fields,
+    road: Boolean(document.getElementById('visit-recommend-road')?.checked)
+  }));
+};
+
+const clearVisitFormState = () => {
+  localStorage.removeItem(VISIT_FORM_KEY);
+  return forgetPickedPhotos();
+};
+
+const openSiteVisitForm = (applicationId) => {
+  currentApplicationId = applicationId;
+  resetSiteVisitForm();
+  navigateTo('siteVisit');
+  loadApplicationInfo(applicationId);
+  loadSiteInfoToVisitForm(applicationId);
+};
+
+const restoreVisitForm = async () => {
+  const state = JSON.parse(localStorage.getItem(VISIT_FORM_KEY) || 'null');
+  if (!state) return;
+
+  // Finished elsewhere since the form was left open
+  const stillOpen = document.querySelector(`.task-action-btn[data-id="${state.applicationId}"][data-process="register_site_visit"]`);
+  if (navigator.onLine && !stillOpen) {
+    await clearVisitFormState();
+    return;
+  }
+
+  openSiteVisitForm(state.applicationId);
+  Object.entries(state.fields).forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+  });
+
+  const dirs = Object.keys(dirAlias);
+  const files = await Promise.all(dirs.map(dir => withPhotoStore('readonly', store => store.get(dir)).catch(() => null)));
+  dirs.forEach((dir, i) => {
+    if (!files[i]) return;
+    directionPhotos[dir] = files[i];
+    renderDirectionPhoto(dir, URL.createObjectURL(files[i]), true);
+  });
+
+  await loadSiteVisitDraft(state.applicationId);
+  const road = document.getElementById('visit-recommend-road');
+  if (road) road.checked = state.road;
+};
+
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator) {
@@ -266,13 +351,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Check if already logged in
   if (localStorage.getItem('svrms_token')) {
-    loadTodoTasks().then(() => navigateTo('todo')).catch(() => navigateTo('login'));
+    loadTodoTasks().then(() => {
+      navigateTo('todo');
+      return restoreVisitForm();
+    }).catch(() => navigateTo('login'));
   } else {
     navigateTo('login');
   }
 
   // --- Logout Logic ---
   document.getElementById('logout-btn')?.addEventListener('click', () => {
+    clearVisitFormState();
     localStorage.removeItem('svrms_token');
     localStorage.removeItem('svrms_user');
     showToast('Logged out successfully');
@@ -281,7 +370,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Back buttons ---
   document.getElementById('back-to-todo')?.addEventListener('click', () => navigateTo('todo'));
-  document.getElementById('back-from-visit')?.addEventListener('click', () => navigateTo('todo'));
+  document.getElementById('back-from-visit')?.addEventListener('click', () => {
+    clearVisitFormState();
+    navigateTo('todo');
+  });
+
+  // Keep what the officer types in the site visit form
+  const visitScreen = document.getElementById('site-visit-screen');
+  visitScreen?.addEventListener('input', saveVisitFormState);
+  visitScreen?.addEventListener('change', saveVisitFormState);
   document.getElementById('back-from-review')?.addEventListener('click', () => navigateTo('todo'));
 
   // --- Self-check checklist → gate submit button ---
@@ -340,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const coordInput = document.getElementById(targetId);
         if (coordInput) {
           coordInput.value = coordsStr;
+          saveVisitFormState();
           showToast('Location updated');
         }
       },
@@ -384,6 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!file) return;
 
       directionPhotos[dir] = file;
+      keepPickedPhoto(dir, file);
 
       const reader = new FileReader();
       reader.onload = (e) => renderDirectionPhoto(dir, e.target.result, true);
@@ -402,6 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dir = Object.keys(dirAlias).find(k => dirAlias[k] === alias);
     if (!dir) return;
     clearPickedPhoto(dir);
+    forgetPickedPhoto(dir);
     // Fall back to the draft's saved photo, if any
     renderDirectionPhoto(dir, savedPhotoUrls[dir], false);
   });
@@ -471,10 +571,12 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast(action === 'submit' ? 'Record sent for review' : 'Draft saved');
       if (action === 'submit') {
         resetSiteVisitForm();
+        clearVisitFormState();
         await loadTodoTasks();
         navigateTo('todo');
       } else {
         // Picked photos are now on the server; don't upload them again on the next save
+        forgetPickedPhotos();
         Object.keys(dirAlias).forEach(dir => {
           clearPickedPhoto(dir);
           applySavedPhoto(dir, saved.photos?.[dir]);
@@ -483,7 +585,10 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       if (err.offline) {
         saveToOfflineQueue('site_visit', payload);
-        if (action === 'submit') navigateTo('todo');
+        if (action === 'submit') {
+          clearVisitFormState();
+          navigateTo('todo');
+        }
       } else {
         showToast(err.message || 'Failed to save site visit');
       }
@@ -577,10 +682,9 @@ async function loadTodoTasks() {
             navigateTo('registerSite');
           }
           else if (processName === 'register_site_visit') {
-            resetSiteVisitForm();
-            navigateTo('siteVisit');
-            loadApplicationInfo(currentApplicationId);
-            loadSiteInfoToVisitForm(currentApplicationId);
+            clearVisitFormState();
+            openSiteVisitForm(currentApplicationId);
+            saveVisitFormState();
             loadSiteVisitDraft(currentApplicationId);
           }
           else if (processName === 'review') {
