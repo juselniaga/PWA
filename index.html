@@ -248,9 +248,19 @@
                         <select id="reg-mukim"
                             class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all appearance-none cursor-pointer">
                             <option disabled selected value="">Select Mukim</option>
-                            <option value="jasin">Jasin</option>
-                            <option value="merlimau">Merlimau</option>
-                            <option value="bemban">Bemban</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+                    </div>
+                </div>
+
+                <!-- BP Dropdown -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">Blok Perancang (BP)</label>
+                    <div class="relative">
+                        <select id="reg-bp"
+                            class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all appearance-none cursor-pointer">
+                            <option disabled selected value="">Select BP</option>
                         </select>
                         <span
                             class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
@@ -259,13 +269,11 @@
 
                 <!-- BPK Dropdown -->
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">BPK</label>
+                    <label class="text-slate-700 text-[10px] font-bold uppercase tracking-wider ml-1">BPK (Optional)</label>
                     <div class="relative">
                         <select id="reg-bpk"
                             class="w-full rounded-xl border-slate-200 bg-white text-slate-900 focus:border-indigo-600 focus:ring-indigo-600/20 h-12 px-4 text-sm shadow-sm transition-all appearance-none cursor-pointer">
-                            <option disabled selected value="">Select BPK</option>
-                            <option value="bpk1">BPK 1.1 - Central</option>
-                            <option value="bpk2">BPK 2.4 - North</option>
+                            <option selected value="">Select BPK</option>
                         </select>
                         <span
                             class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>

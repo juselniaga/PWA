@@ -201,10 +201,50 @@ const resetSiteVisitForm = () => {
 };
 
 const resetRegisterSiteForm = () => {
-  ['reg-mukim', 'reg-bpk', 'reg-lot', 'reg-kategori', 'reg-status-tanah', 'reg-lembaran', 'reg-luas', 'reg-google-lat'].forEach(id => {
+  ['reg-mukim', 'reg-bp', 'reg-bpk', 'reg-lot', 'reg-kategori', 'reg-status-tanah', 'reg-lembaran', 'reg-luas', 'reg-google-lat'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+};
+
+// --- Register Site: Mukim, BP and BPK lists come from the database ---
+const REFERENCES_KEY = 'svrms_references';
+let bpkList = [];
+
+// Keeps the placeholder option and replaces the rest
+const fillSelect = (id, items) => {
+  const select = document.getElementById(id);
+  if (!select) return;
+  select.length = 1;
+  items.forEach(({ value, label }) => select.add(new Option(label, value)));
+  select.value = '';
+};
+
+const fillBpkOptions = (bpId) => {
+  fillSelect('reg-bpk', bpkList
+    .filter(bpk => bpk.bp_id === bpId)
+    .map(bpk => ({ value: bpk.id, label: `${bpk.id} - ${bpk.bpk_name}` })));
+};
+
+const loadReferences = async () => {
+  let references;
+  try {
+    references = await apiFetch('/references');
+    localStorage.setItem(REFERENCES_KEY, JSON.stringify(references));
+  } catch (err) {
+    if (err.unauthorized) return;
+    // Last good copy, so the form can still be filled in without coverage
+    references = JSON.parse(localStorage.getItem(REFERENCES_KEY) || 'null');
+    if (!references) {
+      showToast('Could not load Mukim and BP lists');
+      return;
+    }
+  }
+
+  bpkList = references.bpks;
+  fillSelect('reg-mukim', references.mukims.map(m => ({ value: m.mukim_no, label: `${m.mukim_no} - ${m.mukim}` })));
+  fillSelect('reg-bp', references.bps.map(bp => ({ value: bp.id, label: `${bp.id} - ${bp.bp_name}` })));
+  fillBpkOptions('');
 };
 
 const resetReviewForm = () => {
@@ -509,12 +549,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Form Actions ---
 
   // Register Site
+  document.getElementById('reg-bp')?.addEventListener('change', (e) => fillBpkOptions(e.target.value));
+
   document.getElementById('register-site-action-btn')?.addEventListener('click', async () => {
+    const required = ['reg-mukim', 'reg-bp', 'reg-lot', 'reg-luas'];
+    if (required.some(id => !document.getElementById(id).value.trim())) {
+      showToast('Please fill in Mukim, BP, Lot and Luas');
+      return;
+    }
+
     const payload = {
       application_id: currentApplicationId,
-      mukim: document.getElementById('reg-mukim').value || 'Jasin',
-      bpk: document.getElementById('reg-bpk').value || 'BPK 1.1',
-      lot: document.getElementById('reg-lot').value || 'NA',
+      mukim: document.getElementById('reg-mukim').value,
+      bp: document.getElementById('reg-bp').value,
+      bpk: document.getElementById('reg-bpk').value,
+      lot: document.getElementById('reg-lot').value.trim(),
       kategori_tanah: document.getElementById('reg-kategori').value || 'NA',
       status_tanah: document.getElementById('reg-status-tanah').value || 'NA',
       lembaran: document.getElementById('reg-lembaran').value || 'NA',
@@ -680,6 +729,7 @@ async function loadTodoTasks() {
           if (processName === 'register_site') {
             resetRegisterSiteForm();
             navigateTo('registerSite');
+            loadReferences();
           }
           else if (processName === 'register_site_visit') {
             clearVisitFormState();

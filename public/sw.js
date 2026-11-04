@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jasin-svm-v5';
+const CACHE_NAME = 'jasin-svm-v6';
 const ASSETS = [
   '/',
   '/index.html',
