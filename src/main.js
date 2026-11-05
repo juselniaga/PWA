@@ -52,7 +52,8 @@ const apiFetch = async (endpoint, options = {}) => {
     return data;
   } catch (err) {
     // If network error, throw a specific flag
-    if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+    // The message differs by browser: Chrome "Failed to fetch", Safari "Load failed"
+    if (err.name === 'TypeError') {
       throw { offline: true, message: 'No internet connection' };
     }
     throw err;
@@ -399,6 +400,22 @@ document.addEventListener('DOMContentLoaded', () => {
     navigateTo('login');
   }
 
+  // --- Refresh Tasks ---
+  const refreshBtn = document.getElementById('refresh-tasks-btn');
+  refreshBtn?.addEventListener('click', async () => {
+    const label = document.getElementById('refresh-tasks-label');
+    refreshBtn.disabled = true;
+    label.textContent = 'Refreshing...';
+    try {
+      if (await loadTodoTasks()) showToast('Tasks updated');
+    } catch (err) {
+      // Session expired: apiFetch has already gone back to login
+    } finally {
+      refreshBtn.disabled = false;
+      label.textContent = 'Refresh';
+    }
+  });
+
   // --- Logout Logic ---
   document.getElementById('logout-btn')?.addEventListener('click', () => {
     clearVisitFormState();
@@ -678,13 +695,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- Dynamic Rendering ---
+// Returns whether the list was loaded. On failure the current list stays on screen.
 async function loadTodoTasks() {
   const todoMain = document.querySelector('#todo-screen main');
-  if (!todoMain) return;
+  if (!todoMain) return false;
+  const todoStatus = document.getElementById('todo-status');
 
   try {
     const data = await apiFetch('/todo');
-    
+
+    if (todoStatus) todoStatus.textContent = '';
     todoMain.innerHTML = '<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Today\'s Tasks</h3>';
 
     if (data.applications && data.applications.length > 0) {
@@ -747,13 +767,16 @@ async function loadTodoTasks() {
     } else {
       todoMain.innerHTML += '<p class="text-xs text-slate-400">No pending tasks.</p>';
     }
+    return true;
   } catch (err) {
     if (err.unauthorized) throw err;
-    if (err.offline) {
-      todoMain.innerHTML += '<p class="text-xs text-rose-500">You are offline. Cannot load live tasks.</p>';
-    } else {
-      console.error('Error loading tasks:', err);
+    if (!err.offline) console.error('Error loading tasks:', err);
+    if (todoStatus) {
+      todoStatus.textContent = err.offline
+        ? 'You are offline. Cannot load live tasks.'
+        : 'Could not load tasks. Please try again.';
     }
+    return false;
   }
 }
 
